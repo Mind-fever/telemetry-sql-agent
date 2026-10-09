@@ -1,0 +1,15 @@
+# Postgres local con pgvector. Es opcional: sirve para reproducir el proyecto sin cuenta en la nube
+# y como respaldo si el proyecto gratuito de Supabase esta pausado.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: telemetria
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
