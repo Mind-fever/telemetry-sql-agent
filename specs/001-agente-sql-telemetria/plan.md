@@ -35,7 +35,7 @@ automáticas; la evaluación con el modelo real se ejecuta aparte
 **Constraints**: capa gratuita del modelo (pocas llamadas por pregunta, reintentos con espera);
 solo lectura sobre la base; datos y documentos ficticios; sin secretos en el repositorio
 
-**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, 38 casos de
+**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, 39 casos de
 evaluación (el plan original estimaba unos 25), un usuario por vez
 
 ## Constitution Check
@@ -50,6 +50,12 @@ evaluación (el plan original estimaba unos 25), un usuario por vez
 | IV. Reproducibilidad | `requirements.txt` con versiones fijas, `schema.sql` y seed con semilla, `.env.example`, README con quickstart | Cumple |
 | V. Evaluación y observabilidad | `eval/golden.jsonl` cubre cada comportamiento; trazas con LangSmith; la evaluación se corre con un comando | Cumple |
 | VI. Simplicidad defendible | Un solo motor de datos para SQL y vectores; verificaciones deterministas; sin capas extra | Cumple |
+
+Revisión del 2026-10-12 contra la constitución 1.2.0: la tabla sigue valiendo. La enmienda 1.1.0
+cambió la fila de la base de datos (ahora puede ser local o en la nube; se usó la local). La
+enmienda 1.2.0 afecta a la fila V: dos comportamientos que no se pueden provocar con el modelo
+real (reintento de SQL y aviso de cuota) están cubiertos por pruebas automáticas y no por casos
+de evaluación.
 
 Después del diseño (Phase 1) se vuelve a revisar: sin cambios. Sin violaciones, así que no
 hace falta la tabla de complejidad.
@@ -82,7 +88,8 @@ pregunta + historial
   `sql_generate` como contexto para reintentar, con un máximo de 2 reintentos.
 - **sql_execute**: ejecuta con el rol de solo lectura, con tope de filas y de tiempo.
 - **retrieve**: embebe la pregunta y trae los 4 fragmentos más cercanos por distancia coseno.
-- **synthesize**: redacta la respuesta en el idioma de la pregunta usando solo la evidencia. Si no
+- **synthesize**: redacta la respuesta en el idioma de la pregunta usando solo la evidencia. Junto
+  con las filas recibe la consulta ejecutada, para saber qué filtros ya cumplen (agregado en T054). Si no
   hay filas ni fragmentos útiles, responde que no tiene la información.
 - Llamadas al modelo por pregunta: router, generación de SQL (1 a 3) y síntesis, es decir 3 a 5
   en el peor caso. En las rutas `none` y `refuse` es 1 (corregido el 2026-10-11: antes decía 2).

@@ -197,7 +197,16 @@ con las decisiones del autor.
 - [X] T069 Revisar la constitución con el autor. Decisión: enmendar el principio V para que un comportamiento que no se puede provocar a propósito con el modelo real quede cubierto por una prueba automática (versión 1.2.0)
 - [X] T070 Aclarar en `research.md` cómo se verificaron las fuentes de la etapa de plan
 - [X] T071 Ejecutar `speckit-clarify` sobre `spec.md` y registrar las respuestas del autor. Hecho el 2026-10-12: 5 preguntas, todas respondidas por el autor; las 5 confirmaron el comportamiento existente y 2 quitaron una ambigüedad del texto (pregunta ambigua y tope de filas)
-- [ ] T072 Ejecutar `speckit-analyze` sobre spec, plan y tareas, y decidir con el autor qué hallazgos se corrigen
+- [X] T072 Ejecutar `speckit-analyze` sobre spec, plan y tareas, y decidir con el autor qué hallazgos se corrigen. Hecho el 2026-10-12: 10 hallazgos (1 crítico, 1 alto, 4 medios, 4 bajos), cobertura de requisitos 23 de 24. El autor decidió corregir todos
+
+Tareas que salen del análisis:
+
+- [X] T073 Corregir `spec.md`: dos escenarios de aceptación preguntaban por "el mes pasado" y la base solo tiene datos de septiembre (F1); la entidad "Planta" no existe en la base y faltaba "Área" (F2); el reintento de SQL no decía cuántas veces (B1); el aviso de error no decía qué debe indicar (B2)
+- [X] T074 Reescribir SC-007 por decisión del autor: pedía que un tercero instalara el sistema en menos de 30 minutos, algo que un trabajo individual no puede medir. Pasa a exigir que el proyecto se levante desde cero siguiendo solo el README, que es lo que se verificó el 2026-10-10 (E1)
+- [X] T075 Actualizar `plan.md` y `tasks.md`: la síntesis recibe también la consulta ejecutada (F3), la revisión de la constitución no mencionaba las enmiendas (F4) y el orden de ejecución no mencionaba las fases 9 a 12 (F5)
+- [X] T076 Verificar con un caso de evaluación que el agente no contesta preguntas ajenas a la planta, como exige el principio V (D1): caso nuevo `edge-04` y verificación `answer_excludes` en `eval/run_eval.py`, con su prueba. No se toca ningún caso existente
+- [X] T077 Agregar una prueba automática del manejo de cuota de la evaluación (reintento ante el límite por minuto, corte ante el diario), que no tenía ninguna (C1), en `eval/run_eval.py` y `tests/test_eval_helpers.py`
+- [X] T078 Correr la evaluación completa con el caso nuevo, actualizar el informe y publicar. Sexta corrida, 2026-10-12: 39/39 con `gemini-3.5-flash-lite`, y 39/39 en el experimento de LangSmith `gemini-3.5-flash-lite-49276dc0`. Pruebas automáticas: 98. El informe quedó en 10 páginas con portada
 
 ---
 
@@ -207,6 +216,9 @@ con las decisiones del autor.
 - US1 antes que US2 y US3 porque comparte el grafo; US3 depende de US1 y US2.
 - US4 y US5 dependen de que exista el grafo (US1 a US3).
 - Polish al final.
+- Las fases 9 a 12 se agregaron después, en orden: 9 durante la implementación, 10 tras la primera
+  corrida con el modelo real, 11 en la revisión contra el enunciado y 12 en la revisión del proceso
+  con el autor. Cada una depende de la anterior.
 
 ## Implementation Strategy
 

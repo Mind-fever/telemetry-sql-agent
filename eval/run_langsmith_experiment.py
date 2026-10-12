@@ -38,18 +38,24 @@ from telemetry_agent.models import AgentResponse  # noqa: E402
 DATASET = "agente-sql-telemetria-golden"
 # Claves del caso que describen lo esperado; van a "outputs" del ejemplo en LangSmith.
 EXPECTED_KEYS = ("expect_route", "expect_refused", "expect_grounded", "expect_source", "expect_truncated",
-                 "answer_contains", "answer_regex", "reference_sql")
+                 "answer_contains", "answer_regex", "answer_excludes", "reference_sql")
 
 
 def ensure_dataset(client, cases: list[dict]) -> None:
-    """Crea el conjunto de datos con un ejemplo por caso. Si ya existe, lo deja como esta."""
+    """Crea el conjunto de datos con un ejemplo por caso. Si ya existe, agrega solo los casos nuevos
+    (no modifica ni borra los ejemplos que ya estan)."""
     if client.has_dataset(dataset_name=DATASET):
-        count = len(list(client.list_examples(dataset_name=DATASET)))
-        print(f"El conjunto de datos '{DATASET}' ya existe ({count} ejemplos).")
-        if count != len(cases):
-            print(f"AVISO: golden.jsonl tiene {len(cases)} casos. Borrar el conjunto en LangSmith para regenerarlo.")
+        dataset = client.read_dataset(dataset_name=DATASET)
+        known = {(e.metadata or {}).get("case_id") for e in client.list_examples(dataset_id=dataset.id)}
+        missing = [c for c in cases if c["id"] not in known]
+        print(f"El conjunto de datos '{DATASET}' ya existe ({len(known)} ejemplos).")
+    else:
+        dataset = client.create_dataset(
+            DATASET, description="Casos de evaluacion del agente SQL de telemetria (eval/golden.jsonl)."
+        )
+        missing = cases
+    if not missing:
         return
-    dataset = client.create_dataset(DATASET, description="Casos de evaluacion del agente SQL de telemetria (eval/golden.jsonl).")
     client.create_examples(
         dataset_id=dataset.id,
         examples=[
@@ -58,10 +64,10 @@ def ensure_dataset(client, cases: list[dict]) -> None:
                 "outputs": {k: case[k] for k in EXPECTED_KEYS if k in case},
                 "metadata": {"case_id": case["id"], "category": case["category"]},
             }
-            for case in cases
+            for case in missing
         ],
     )
-    print(f"Conjunto de datos '{DATASET}' creado con {len(cases)} ejemplos.")
+    print(f"Se agregaron {len(missing)} ejemplos: {', '.join(c['id'] for c in missing)}.")
 
 
 def main() -> None:

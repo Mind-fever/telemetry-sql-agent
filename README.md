@@ -27,9 +27,9 @@ en la computadora de quien lo usa.
 
 ## Resultado de la evaluación
 
-Última corrida, 12 de octubre de 2026, con `gemini-3.5-flash-lite`: 38 de 38 casos aprobados, tanto con
+Última corrida, 12 de octubre de 2026, con `gemini-3.5-flash-lite`: 39 de 39 casos aprobados, tanto con
 `eval/run_eval.py` como en el experimento de LangSmith. El detalle está en `eval/results/latest.md`.
-Las pruebas automáticas son 94 y pasan todas.
+Las pruebas automáticas son 98 y pasan todas.
 
 El modelo no responde siempre igual, así que el resultado puede variar entre corridas. El historial de las
 corridas anteriores, con los errores que se encontraron y corrigieron, está en `eval/results/` y en el informe.
@@ -70,7 +70,7 @@ python -m telemetry_agent.cli "¿Cuántas alarmas críticas hubo en septiembre?"
 
 # 6. Evaluar
 python eval/run_eval.py --check-refs        # valores de referencia, sin modelo
-python eval/run_eval.py                     # corre los 38 casos; el resultado queda en eval/results/
+python eval/run_eval.py                     # corre los 39 casos; el resultado queda en eval/results/
 python eval/run_langsmith_experiment.py     # los mismos casos como experimento de LangSmith
 ```
 
@@ -129,7 +129,7 @@ respuesta, fuente elegida, consulta SQL, filas, fragmentos citados y si el pedid
 
 ## Evaluación
 
-`eval/golden.jsonl` tiene 38 casos: preguntas de datos, de documentos, combinadas, pedidos de escritura que deben
+`eval/golden.jsonl` tiene 39 casos: preguntas de datos, de documentos, combinadas, pedidos de escritura que deben
 rechazarse, preguntas sin respaldo, preguntas que no necesitan fuente, casos borde y una de seguimiento.
 
 Las verificaciones son deterministas, sin un modelo que haga de juez. Para las preguntas de datos, el evaluador

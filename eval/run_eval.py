@@ -146,9 +146,33 @@ def evaluate_case(case: dict, resp, ref_values: list[Any] | None) -> dict[str, b
         checks["respuesta_contiene"] = all(t.lower() in answer.lower() for t in case["answer_contains"])
     if "answer_regex" in case:
         checks["respuesta_regex"] = re.search(case["answer_regex"], answer) is not None
+    if "answer_excludes" in case:  # lo que la respuesta no debe decir (por ejemplo, un dato de conocimiento propio)
+        checks["respuesta_no_incluye"] = not any(fold(t) in fold(answer) for t in case["answer_excludes"])
     if case.get("category") == "none":
         checks["sin_sql_ni_fuentes"] = resp.sql is None and not resp.sources
     return checks
+
+
+def run_with_quota_retry(run_case, case: dict, sleep=time.sleep):
+    """Corre un caso cuidando la cuota del modelo.
+
+    run_case(case) devuelve (respuesta, error, segundos, run_id). Ante el limite por minuto se
+    espera y se reintenta una sola vez. Devuelve ese resultado y el limite que quedo sin resolver
+    ("day", "minute" o None). Si no es None hay que cortar la corrida: un error de cuota no dice
+    nada sobre el agente y no se cuenta como caso fallado.
+    """
+    def scope_of(outcome) -> str | None:
+        resp, error = outcome[0], outcome[1]
+        return quota_scope(error or getattr(resp, "error", None))
+
+    outcome = run_case(case)
+    scope = scope_of(outcome)
+    if scope == "minute":
+        print(f"  limite por minuto en {case['id']}: espero {QUOTA_WAIT_SECONDS} s y reintento el caso")
+        sleep(QUOTA_WAIT_SECONDS)
+        outcome = run_case(case)
+        scope = scope_of(outcome)
+    return outcome, scope
 
 
 def main() -> None:
@@ -220,15 +244,7 @@ def main() -> None:
     stop_reason = None
     for i, case in enumerate(cases):
         turns = case.get("turns") or [case["question"]]
-        resp, error, elapsed, run_id = run_case(case)
-
-        # Un error de cuota no dice nada sobre el agente: no se cuenta como caso fallado.
-        scope = quota_scope(error or getattr(resp, "error", None))
-        if scope == "minute":
-            print(f"  limite por minuto en {case['id']}: espero {QUOTA_WAIT_SECONDS} s y reintento el caso")
-            time.sleep(QUOTA_WAIT_SECONDS)
-            resp, error, elapsed, run_id = run_case(case)
-            scope = quota_scope(error or getattr(resp, "error", None))
+        (resp, error, elapsed, run_id), scope = run_with_quota_retry(run_case, case)
         if scope:
             stop_reason = (error or resp.error or "")[-120:]
             print(f"  corte por cuota ({scope}) en {case['id']}: {stop_reason}")

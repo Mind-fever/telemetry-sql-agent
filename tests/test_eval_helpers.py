@@ -89,6 +89,52 @@ def test_truncated_case_requires_the_system_flag_and_the_warning_in_the_answer()
     assert not ev.evaluate_case(case, not_cut, None)["resultado_recortado"]
 
 
+def test_off_topic_case_fails_if_the_agent_answers_from_its_own_knowledge():
+    case = {"id": "o", "category": "edge", "expect_route": "none",
+            "answer_regex": "(?i)planta|mantenimiento", "answer_excludes": ["Cervantes"]}
+    declines = resp(route="none", answer="Solo puedo ayudarte con la operación de la planta.")
+    answers = resp(route="none", answer="Lo escribió Miguel de Cervantes. Además ayudo con la planta.")
+    assert all(ev.evaluate_case(case, declines, None).values())
+    assert not ev.evaluate_case(case, answers, None)["respuesta_no_incluye"]
+
+
+def _quota_runner(errors):
+    """run_case de mentira: devuelve en orden los errores dados (None = el caso corrio bien)."""
+    calls = []
+
+    def run_case(case):
+        error = errors[len(calls)]
+        calls.append(case["id"])
+        return resp(error=error), None, 1.0, None
+
+    return run_case, calls
+
+
+DAY = "429 RESOURCE_EXHAUSTED [cuota: GenerateRequestsPerDayPerProjectPerModel-FreeTier, limite 20]"
+MINUTE = "429 RESOURCE_EXHAUSTED [cuota: GenerateRequestsPerMinutePerProjectPerModel-FreeTier, limite 15]"
+
+
+def test_daily_quota_stops_the_run_without_retrying():
+    run_case, calls = _quota_runner([DAY])
+    waits = []
+    _, scope = ev.run_with_quota_retry(run_case, {"id": "c"}, sleep=waits.append)
+    assert scope == "day" and len(calls) == 1 and waits == []
+
+
+def test_per_minute_quota_waits_and_retries_once():
+    run_case, calls = _quota_runner([MINUTE, None])
+    waits = []
+    (answer, *_), scope = ev.run_with_quota_retry(run_case, {"id": "c"}, sleep=waits.append)
+    assert scope is None and len(calls) == 2 and waits == [ev.QUOTA_WAIT_SECONDS]
+    assert answer.error is None
+
+
+def test_per_minute_quota_twice_in_a_row_stops_the_run():
+    run_case, calls = _quota_runner([MINUTE, MINUTE])
+    _, scope = ev.run_with_quota_retry(run_case, {"id": "c"}, sleep=lambda s: None)
+    assert scope == "minute" and len(calls) == 2
+
+
 def test_summary_computes_success_criteria():
     results = [
         {"id": "a", "category": "sql", "passed": True, "checks": {"ruta": True}, "seconds": 3.0, "route": "sql", "sources": [], "grounded": True},
