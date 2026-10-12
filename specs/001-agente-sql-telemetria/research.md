@@ -6,6 +6,11 @@ Cada decisión indica su estado de verificación. "Verificado" significa que se 
 página oficial el 2026-10-09. "No verificado" significa que no se pudo confirmar y queda como
 punto a comprobar durante la implementación, con la acción que lo resuelve.
 
+Aclaración del 2026-10-12 sobre el método: las páginas web se consultaron con una herramienta que
+las resume, no leyendo el texto completo. Por eso "verificado" en este documento significa
+"consultado en la página oficial ese día". Los puntos que después se comprobaron con las claves
+reales están marcados como "Actualización" con su fecha, y esos sí salen de una ejecución real.
+
 ## D1. Modelo de lenguaje: Gemini en capa gratuita
 
 - **Decisión**: usar un modelo Flash de Gemini, configurable por variable de entorno

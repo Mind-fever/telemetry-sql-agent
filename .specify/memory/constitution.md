@@ -1,12 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 -> 1.1.0
-- Principios modificados: ninguno
-- Secciones modificadas: Restricciones Técnicas (base de datos), Governance (lista de enmiendas)
+- Version change: 1.1.0 -> 1.2.0
+- Principios modificados: V (se admite una prueba automática cuando el comportamiento no se puede
+  provocar con el modelo real)
+- Secciones modificadas: Governance (lista de enmiendas)
 - Secciones eliminadas: ninguna
-- Artefactos actualizados: spec.md (Assumptions), research.md (D3), tasks.md (T059)
+- Artefactos actualizados: tasks.md (T069)
 - TODOs diferidos: ninguno
-- Historial: (plantilla sin ratificar) -> 1.0.0 el 2026-10-09, principios I a VI
+- Historial: (plantilla sin ratificar) -> 1.0.0 el 2026-10-09, principios I a VI;
+  1.0.0 -> 1.1.0 el 2026-10-12, restricción técnica de la base de datos
 -->
 # Agente SQL de Telemetría y Mantenimiento Industrial Constitution
 
@@ -42,7 +44,9 @@ Fundamento: el criterio de aprobación pide código documentado y reproducible.
 
 ### V. Evaluación y observabilidad
 Todo comportamiento del agente MUST tener al menos un caso en un conjunto de evaluación con
-respuesta esperada. Las ejecuciones MUST quedar trazadas en LangSmith. Un cambio que empeora el
+respuesta esperada. Si un comportamiento no se puede provocar a propósito con el modelo real
+(por ejemplo, el reintento cuando la consulta generada falla, o el aviso cuando se agota la cuota
+del modelo), MUST tener en su lugar una prueba automática. Las ejecuciones MUST quedar trazadas en LangSmith. Un cambio que empeora el
 resultado del conjunto de evaluación MUST NOT integrarse sin justificación escrita.
 Fundamento: sin casos de prueba no hay forma de afirmar que el agente funciona.
 
@@ -89,4 +93,10 @@ resultado cumpla estos principios, y cualquier excepción se justifica por escri
   con el Postgres local de Docker, y Supabase no se llegó a probar. La restricción escrita no
   describía el sistema real. Ningún principio cambió. Es MINOR porque amplía una regla.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-09 | **Last Amended**: 2026-10-12
+- **1.2.0 (2026-10-12)**. Se amplió el principio V. Antes exigía un caso de evaluación para todo
+  comportamiento, sin excepción. Motivo: dos comportamientos (el reintento de SQL y el aviso de
+  cuota agotada) no se pueden provocar a propósito con el modelo real, y estaban cubiertos solo
+  por pruebas automáticas. La regla escrita no describía lo que se hizo. La decisión la tomó el
+  autor al revisar la constitución. Es MINOR porque amplía una regla.
+
+**Version**: 1.2.0 | **Ratified**: 2026-10-09 | **Last Amended**: 2026-10-12

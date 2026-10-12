@@ -185,6 +185,22 @@ Surgieron al revisar cada criterio del enunciado contra el repositorio y la base
 
 ---
 
+## Phase 12: Revisión del proceso SDD con el autor (2026-10-12)
+
+Al revisar cómo se había usado Spec Kit se encontró lo siguiente. Spec Kit se instaló con su
+instalador oficial y los artefactos de las fases 1 a 8 se escribieron siguiendo sus plantillas y
+las instrucciones de cada comando, pero de corrido: sin ejecutar los comandos, sin la etapa de
+aclaración (`clarify`), sin el análisis de consistencia (`analyze`) y sin que el autor revisara
+cada etapa antes de pasar a la siguiente. Esta fase hace esa revisión, con los comandos reales y
+con las decisiones del autor.
+
+- [X] T069 Revisar la constitución con el autor. Decisión: enmendar el principio V para que un comportamiento que no se puede provocar a propósito con el modelo real quede cubierto por una prueba automática (versión 1.2.0)
+- [X] T070 Aclarar en `research.md` cómo se verificaron las fuentes de la etapa de plan
+- [X] T071 Ejecutar `speckit-clarify` sobre `spec.md` y registrar las respuestas del autor. Hecho el 2026-10-12: 5 preguntas, todas respondidas por el autor; las 5 confirmaron el comportamiento existente y 2 quitaron una ambigüedad del texto (pregunta ambigua y tope de filas)
+- [ ] T072 Ejecutar `speckit-analyze` sobre spec, plan y tareas, y decidir con el autor qué hallazgos se corrigen
+
+---
+
 ## Dependencies & Execution Order
 
 - Setup, luego Foundational, que bloquea todo lo demás.
