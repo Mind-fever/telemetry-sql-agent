@@ -53,7 +53,7 @@ def get_settings() -> Settings:
         database_url=os.getenv("DATABASE_URL", ""),
         database_url_ro=os.getenv("DATABASE_URL_RO", ""),
         gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
-        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash"),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
         embedding_model=os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2"),
         embedding_dimensions=_int("EMBEDDING_DIMENSIONS", 768),
         sql_max_rows=_int("SQL_MAX_ROWS", 50),

@@ -1,0 +1,2 @@
+# El volcado se carga con psql: los saltos de linea deben quedar en LF tambien en Windows.
+db/dump/*.sql text eol=lf

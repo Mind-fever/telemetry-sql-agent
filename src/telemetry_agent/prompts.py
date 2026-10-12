@@ -25,6 +25,12 @@ explica en una o dos frases que este asistente solo consulta informacion y no pu
 Reglas:
 - Si la pregunta es un seguimiento ("y el mes anterior?", "y la P-102?"), usa el historial para entender de que habla \
 y elegi la misma fuente que correspondia a la pregunta anterior.
+- La ruta none es solo para saludos y temas ajenos a la planta. Si la pregunta es sobre equipos, repuestos, \
+mantenimiento u operacion de la planta, nunca elijas none aunque creas que la respuesta no esta en las fuentes: \
+elegi docs o sql para que se busque. Si no aparece, lo informa el paso siguiente.
+- Excepcion: si la pregunta es tan ambigua que no se sabe que equipo o que dato pide (por ejemplo "que pasa con el \
+motor?", sin codigo ni dato concreto, y el historial no lo aclara), elegi none y en direct_reply pedi que precise el \
+codigo del equipo y que quiere saber (alarmas, lecturas, ordenes, procedimiento).
 - Si dudas entre sql y docs porque la pregunta menciona ambos tipos de informacion, elegi both.
 - language es el idioma en que escribio el usuario: es o en. direct_reply debe estar en ese idioma.
 - En las rutas sql, docs y both dejá direct_reply vacio."""
@@ -43,8 +49,16 @@ sin acentos y en minuscula salvo los nombres de areas.
 - Para fechas usa timestamptz y rangos semiabiertos, por ejemplo: fecha_inicio >= '2026-09-01' AND fecha_inicio < '2026-10-01'.
 - Para identificar un equipo por su codigo (por ejemplo P-101) une con equipos y filtra por equipos.codigo.
 - Si la pregunta pide "el ultimo" o "el mas reciente", ordena por fecha descendente y usa LIMIT 1.
-- Si no se pide un limite, agrega LIMIT 50 a las consultas que listan filas.
+- No agregues LIMIT a las consultas que listan filas, salvo que la pregunta pida una cantidad ("los 5 ultimos") o \
+"el ultimo". El sistema recorta el resultado por su cuenta y avisa cuando lo hace.
 - Devuelve columnas con nombres claros (alias en castellano si hace falta).
+- La base no guarda procedimientos, normas, plazos ni pasos a seguir: eso esta en los documentos y lo busca otro \
+componente. Si la pregunta pide un dato Y un procedimiento, la consulta trae solo los datos del hecho. Para una \
+alarma incluye siempre codigo del equipo, magnitud del sensor, severidad y fecha_inicio.
+- Si el esquema no tiene una columna para el dato pedido (por ejemplo costos, o datos de diseño del fabricante), no \
+lo reemplaces por otra columna parecida. Un alias nunca debe darle a una columna el nombre de un dato que no es: \
+umbral_critico no es una presion nominal. En ese caso devolve los datos basicos de la entidad nombrada con sus \
+nombres reales.
 
 Ejemplos:
 Pregunta: cuantas alarmas criticas hubo en el area Bombeo de agua?
@@ -88,9 +102,14 @@ conocimiento propio ni inventes datos.
 Reglas:
 - Responde en el idioma de la pregunta, de forma breve y directa. Para numeros y listas usa exactamente los valores \
 de la evidencia.
+- La evidencia de la base trae la consulta ejecutada y sus filas. Las filas ya cumplen todas las condiciones de la \
+consulta: si filtra por estado = 'fuera de servicio', las filas devueltas son los equipos fuera de servicio, aunque \
+esa columna no aparezca entre las columnas.
 - Si la evidencia de la base es una tabla vacia, es una respuesta valida: indicá que no hay registros que cumplan.
 - Si la evidencia no alcanza para responder (no hay filas ni fragmentos relevantes, o la consulta fallo), \
 deci claramente que no tenes esa informacion y pone grounded=false. No completes con suposiciones.
+- Las columnas de la evidencia son lo que dicen sus nombres. Si ninguna columna ni fragmento contiene exactamente el \
+dato pedido, no presentes otro valor como si lo fuera: deci que no tenes esa informacion y pone grounded=false.
 - Si usas fragmentos de documentos, nombra el archivo y la pagina en la respuesta, por ejemplo \
 (manual_mantenimiento_preventivo.pdf, pagina 4), y lista en used_fragments los numeros de los fragmentos que usaste.
 - Si el resultado de la base fue recortado, aclaralo.

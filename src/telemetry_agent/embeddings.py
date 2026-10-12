@@ -51,17 +51,27 @@ class GeminiEmbedder:
         config_args: dict = {"output_dimensionality": self.dimensions}
         if task_type and not self._prefixed:
             config_args["task_type"] = task_type
+        # Cada texto va como un Content propio. Si se pasa una lista de strings, gemini-embedding-2
+        # la toma como las partes de un solo contenido y devuelve un unico vector para toda la lista.
+        items = [types.Content(parts=[types.Part(text=text)]) for text in contents]
         last_error: Exception | None = None
         for attempt in range(4):
             try:
                 result = self._client.models.embed_content(
-                    model=self._model, contents=contents, config=types.EmbedContentConfig(**config_args)
+                    model=self._model, contents=items, config=types.EmbedContentConfig(**config_args)
                 )
-                return [list(e.values) for e in result.embeddings]
+                break
             except Exception as exc:  # cuota o error transitorio: espera creciente
                 last_error = exc
                 time.sleep(2 * (attempt + 1) ** 2)
-        raise RuntimeError(f"No se pudo calcular el embedding: {last_error}")
+        else:
+            raise RuntimeError(f"No se pudo calcular el embedding: {last_error}")
+        vectors = [list(e.values) for e in result.embeddings]
+        if len(vectors) != len(contents):
+            raise RuntimeError(
+                f"El modelo de embeddings devolvio {len(vectors)} vectores para {len(contents)} textos."
+            )
+        return vectors
 
     def embed_documents(self, items: list[tuple[str, str]]) -> list[list[float]]:
         texts = [

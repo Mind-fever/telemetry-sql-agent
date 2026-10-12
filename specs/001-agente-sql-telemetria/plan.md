@@ -35,8 +35,8 @@ automáticas; la evaluación con el modelo real se ejecuta aparte
 **Constraints**: capa gratuita del modelo (pocas llamadas por pregunta, reintentos con espera);
 solo lectura sobre la base; datos y documentos ficticios; sin secretos en el repositorio
 
-**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, unos 25 casos de
-evaluación, un usuario por vez
+**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, 38 casos de
+evaluación (el plan original estimaba unos 25), un usuario por vez
 
 ## Constitution Check
 
@@ -85,7 +85,7 @@ pregunta + historial
 - **synthesize**: redacta la respuesta en el idioma de la pregunta usando solo la evidencia. Si no
   hay filas ni fragmentos útiles, responde que no tiene la información.
 - Llamadas al modelo por pregunta: router, generación de SQL (1 a 3) y síntesis, es decir 3 a 5
-  en el peor caso. En la ruta `none` son 2.
+  en el peor caso. En las rutas `none` y `refuse` es 1 (corregido el 2026-10-11: antes decía 2).
 
 El historial de la conversación se guarda por hilo en la memoria del grafo, que es lo que permite
 las preguntas de seguimiento (FR-011).

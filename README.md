@@ -21,7 +21,9 @@ Solo lee: nunca modifica la base.
 
 Criterios de promoción que cubre: SDD, framework agéntico (LangGraph), interfaz gráfica (Streamlit) y
 observabilidad y evaluación (LangSmith). La base de datos puede alojarse en la nube (Supabase) o correr local
-con Docker. El despliegue del agente en la nube no está incluido: se ejecuta en la computadora de quien lo usa.
+con Docker. Todo lo que muestra el informe se probó con la base local; la opción de Supabase está prevista en el
+código pero no se probó. El despliegue del agente en la nube no está incluido: se ejecuta en la computadora de
+quien lo usa.
 
 ## Requisitos
 
@@ -57,8 +59,27 @@ python -m telemetry_agent.cli "¿Cuántas alarmas críticas hubo en septiembre?"
 
 # 6. Evaluar
 python eval/run_eval.py --check-refs # valores de referencia, sin modelo
-python eval/run_eval.py              # corre los 35 casos; el resultado queda en eval/results/
+python eval/run_eval.py              # corre los 38 casos; el resultado queda en eval/results/
 ```
+
+### Cargar los datos desde el volcado (alternativa al paso de seed e ingesta)
+
+`db/dump/telemetria_datos.sql` tiene los datos de las 7 tablas y los fragmentos de los PDF con sus embeddings,
+tal como quedaron en la evaluación. Sirve para ver los datos sin ejecutar nada y para cargar la base sin API key:
+
+```bash
+python scripts/setup_db.py           # crea las tablas vacías y el rol
+docker compose exec -T db psql -U postgres -d telemetria < db/dump/telemetria_datos.sql
+```
+
+## Informe y evidencias
+
+| Qué | Dónde |
+|---|---|
+| Informe técnico | `docs/informe/` |
+| Capturas de la interfaz con el modelo real | `docs/informe/capturas/` |
+| Resultado de la última evaluación | `eval/results/latest.md` (el detalle por caso está en el `.json` de la misma carpeta) |
+| Casos de evaluación y respuestas esperadas | `eval/golden.jsonl` |
 
 ### Variables de entorno
 
@@ -67,7 +88,7 @@ python eval/run_eval.py              # corre los 35 casos; el resultado queda en
 | `DATABASE_URL` | Conexión con permisos de escritura. La usan solo `setup_db.py`, `seed.py` e `ingest_docs.py`. |
 | `DATABASE_URL_RO` | Conexión del rol `agent_ro` (solo lectura). La usa el agente. Define la clave del rol. |
 | `GEMINI_API_KEY` | Clave del modelo de lenguaje y de los embeddings. |
-| `GEMINI_MODEL` | Modelo de chat. Por defecto `gemini-3.5-flash`. |
+| `GEMINI_MODEL` | Modelo de chat. Por defecto `gemini-3.5-flash-lite`. |
 | `GEMINI_EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS` | Embeddings. Por defecto `gemini-embedding-2` con 768 dimensiones. |
 | `LANGSMITH_TRACING`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT` | Trazas en LangSmith. |
 | `SQL_MAX_ROWS`, `SQL_TIMEOUT_MS`, `SQL_MAX_RETRIES`, `RETRIEVAL_TOP_K` | Límites del agente. |
@@ -116,8 +137,10 @@ como "hoy".
   Supabase (Database, Extensions). Si quedó en el esquema `extensions`, escribir `extensions.vector(768)` en
   `db/schema.sql`.
 - **No conecta a Supabase.** Probar con la cadena de conexión del pooler en lugar de la directa, o al revés.
-- **Errores 429 o `RESOURCE_EXHAUSTED`.** Se alcanzó el límite de la capa gratuita de Gemini. Esperar un minuto o
-  usar `--delay` más alto en la evaluación. Los límites reales de cada modelo se ven en Google AI Studio.
+- **Errores 429 o `RESOURCE_EXHAUSTED`.** Se alcanzó el límite de la capa gratuita de Gemini. El mensaje del agente
+  indica si es el límite por minuto o el diario. La evaluación espera y reintenta sola ante el límite por minuto, y
+  se detiene ante el diario. Límites observados el 2026-10-10: `gemini-3.5-flash` 5 pedidos por minuto y 20 por día;
+  `gemini-3.5-flash-lite` 15 por minuto. Los límites vigentes se ven en https://ai.dev/rate-limit.
 - **El nombre del modelo no existe.** Los nombres de los modelos cambian. Ver la lista vigente en la documentación
   de Gemini y ajustar `GEMINI_MODEL`.
 - **`ingest_docs.py --fake`** usa embeddings falsos y solo sirve para probar el flujo sin API key. No usar para

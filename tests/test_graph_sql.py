@@ -56,6 +56,18 @@ def test_sql_path_returns_the_real_number():
     assert len(llm.calls) == 3
 
 
+def test_synthesis_receives_the_executed_query_so_it_knows_the_filters():
+    agent, llm = make_agent([
+        sql_route(),
+        "select codigo from equipos where estado = 'fuera de servicio'",
+        synth(),
+    ])
+    agent.ask("¿qué equipos están fuera de servicio?")
+    evidence = llm.calls[2]["user"]
+    assert "estado = 'fuera de servicio'" in evidence
+    assert '"filas"' in evidence
+
+
 def test_the_schema_given_to_the_model_comes_from_the_database():
     agent, llm = make_agent([sql_route(), "select 1 as x from areas limit 1", synth()])
     agent.ask("probar")

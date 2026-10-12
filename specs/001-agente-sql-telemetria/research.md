@@ -20,6 +20,12 @@ punto a comprobar durante la implementación, con la acción que lo resuelve.
   reintenta con espera creciente ante errores de cuota, y el modelo se cambia sin tocar código.
 - **Acción**: al tener la API key, mirar los límites reales en AI Studio y anotarlos en el informe.
 - **Alternativa descartada**: modelos Pro, por no estar en la capa gratuita.
+- **Actualización del 2026-10-10 (verificado con la API key real)**: los límites se leyeron del
+  error 429 que devuelve la API. `gemini-3.5-flash`: 5 pedidos por minuto y 20 por día. La
+  evaluación completa necesita unas 90 llamadas, así que con ese modelo no se puede correr en un
+  día. Se cambió el valor por defecto a `gemini-3.5-flash-lite`: 15 pedidos por minuto, y en dos
+  corridas completas seguidas (unas 100 llamadas cada una) no apareció un límite diario. No se
+  conoce el valor exacto de su límite diario.
 - **Fuente**: https://ai.google.dev/gemini-api/docs/pricing y
   https://ai.google.dev/gemini-api/docs/rate-limits
 
@@ -39,6 +45,10 @@ punto a comprobar durante la implementación, con la acción que lo resuelve.
   página de precios quedó fuera del texto que se pudo leer.
 - **Acción**: la primera ingesta lo confirma. Si hubiera costo o un límite que bloquee, la
   clase de embeddings es intercambiable y se documenta la alternativa en el informe.
+- **Actualización del 2026-10-10 (verificado con la API key real)**: la ingesta funcionó con una
+  clave de la capa gratuita. Se encontró que, si se le pasa una lista de textos, el modelo
+  devuelve un solo vector para toda la lista. Cada texto se envía como un contenido separado, y
+  la ingesta falla si la cantidad de vectores no coincide con la de fragmentos.
 - **Fuente**: https://ai.google.dev/gemini-api/docs/embeddings
 
 ## D3. Base de datos y almacén vectorial: PostgreSQL con pgvector
@@ -59,6 +69,11 @@ punto a comprobar durante la implementación, con la acción que lo resuelve.
 - **Riesgo a gestionar**: la pausa por inactividad. Si el proyecto está pausado el día del
   coloquio, hay que reactivarlo antes. Mitigación: usarlo durante la semana previa y tener un
   Postgres local (docker compose) como respaldo.
+- **Actualización del 2026-10-12**: Supabase no se llegó a probar. Todo el desarrollo, las
+  pruebas y la evaluación se hicieron con el Postgres local de Docker (imagen
+  `pgvector/pgvector:pg16`), donde `create extension vector` funcionó. Los dos puntos no
+  verificados de arriba siguen sin verificar. La constitución se enmendó (versión 1.1.0) para
+  que la restricción describa el sistema real.
 - **Alternativas descartadas**: SQLite más una base vectorial aparte (dos tecnologías sin
   necesidad); Neon u otro Postgres (sin ventaja que justifique cambiar).
 - **Fuente**: https://supabase.com/pricing y

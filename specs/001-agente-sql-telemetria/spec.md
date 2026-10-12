@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-09
 
-**Status**: Draft
+**Status**: Implementada y evaluada con el modelo real (2026-10-12)
 
 **Input**: User description: "Un agente de IA que recibe preguntas en castellano o inglés sobre la operación y el mantenimiento de una planta industrial ficticia. Responde consultando una base relacional de telemetría y mantenimiento y, cuando hace falta, documentos PDF con manuales y procedimientos. Decide por sí mismo qué fuente usar en cada pregunta. Se usa desde una interfaz de chat y cada ejecución queda registrada y evaluable."
 
@@ -144,7 +144,7 @@ Quien desarrolla el agente puede ver el recorrido de cada pregunta (qué fuente 
 ## Assumptions
 
 - El trabajo lo realiza una sola persona y se entrega el 16/10/2026 a las 23:59 (GMT-03), con coloquio el 23/10 o el 30/10.
-- Se apunta a los criterios de promoción de metodología SDD, uso de framework agéntico, interfaz gráfica y observabilidad con evaluación. El despliegue en la nube del agente queda como mejora opcional, aunque la base de datos ya vive en un servicio en la nube.
+- Se apunta a los criterios de promoción de metodología SDD, uso de framework agéntico, interfaz gráfica y observabilidad con evaluación. El despliegue en la nube del agente queda como mejora opcional. La base de datos puede estar en un servicio en la nube o correr local; el desarrollo y la evaluación se hicieron con la base local (corregido el 2026-10-12: antes decía que la base ya vivía en la nube).
 - Los usuarios son personal de mantenimiento y supervisión que escribe preguntas en castellano rioplatense o en inglés.
 - La planta, los equipos, las personas y los documentos son ficticios. Se inspiran en el dominio de la telemetría industrial, pero no contienen datos reales de ningún proyecto ni organización.
 - Las decisiones técnicas (lenguaje, framework, proveedores) se toman en el plan, respetando las restricciones de la constitución del proyecto.

@@ -41,6 +41,14 @@ def test_text_mentions_handles_integer_decimal_and_thousands_formats():
     assert ev.text_mentions("La tecnica es Camila Cabrera.", "Camila Cabrera")
 
 
+def test_text_comparison_ignores_accents_but_not_different_words():
+    assert ev.text_mentions("Hay 34 sensores de vibración y 18 de presión.", "vibracion")
+    assert ev.text_mentions("Hay 34 sensores de vibración y 18 de presión.", "presion")
+    assert not ev.text_mentions("Hay 34 sensores de temperatura.", "vibracion")
+    assert ev.same_value("Vibración", "vibracion")
+    assert not ev.same_value("critica", "alerta")
+
+
 def test_refusal_case_requires_a_refusal():
     case = {"id": "r", "category": "refuse", "expect_refused": True}
     assert ev.evaluate_case(case, resp(refused=True, route="refuse"), None) == {"rechazado": True}
@@ -70,6 +78,17 @@ def test_sql_case_checks_rows_and_text():
     assert not ev.evaluate_case(case, wrong_rows, [21])["filas_correctas"]
 
 
+def test_truncated_case_requires_the_system_flag_and_the_warning_in_the_answer():
+    case = {"id": "e", "category": "edge", "expect_route": "sql", "expect_truncated": True,
+            "answer_regex": "(?i)recort"}
+    good = resp(answer="Se muestran 50; el resultado fue recortado.", rows=[{"id": 1}], rows_truncated=True)
+    silent = resp(answer="Estas son las alarmas.", rows=[{"id": 1}], rows_truncated=True)
+    not_cut = resp(answer="El resultado fue recortado.", rows=[{"id": 1}], rows_truncated=False)
+    assert all(ev.evaluate_case(case, good, None).values())
+    assert not ev.evaluate_case(case, silent, None)["respuesta_regex"]
+    assert not ev.evaluate_case(case, not_cut, None)["resultado_recortado"]
+
+
 def test_summary_computes_success_criteria():
     results = [
         {"id": "a", "category": "sql", "passed": True, "checks": {"ruta": True}, "seconds": 3.0, "route": "sql", "sources": [], "grounded": True},
@@ -81,3 +100,14 @@ def test_summary_computes_success_criteria():
     assert s["SC-002"]["ok"] is True
     assert s["SC-004"]["ok"] is False
     assert s["SC-001"]["ok"] is False  # 66.7% < 85%
+
+
+def test_report_names_the_model_and_flags_an_incomplete_run():
+    results = [{"id": "a", "category": "sql", "passed": True, "checks": {"ruta": True}, "seconds": 3.0,
+                "route": "sql", "sources": [], "grounded": True}]
+    summary = ev.summarize(results, data_intact=True)
+    full = ev.to_markdown(summary, results, {"model": "modelo-x", "planned": 1, "not_run": [], "stop_reason": None})
+    cut = ev.to_markdown(summary, results, {"model": "modelo-x", "planned": 3, "not_run": ["b", "c"], "stop_reason": "x"})
+    assert "modelo-x" in full and "Corrida incompleta" not in full
+    assert "Casos ejecutados: 1 de 3" in cut
+    assert "Corrida incompleta" in cut and "b, c" in cut

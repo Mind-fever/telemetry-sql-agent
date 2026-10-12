@@ -1,10 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: (plantilla sin ratificar) -> 1.0.0
-- Principios agregados: I a VI
-- Secciones agregadas: Restricciones Técnicas, Flujo de Desarrollo y Puertas de Calidad
+- Version change: 1.0.0 -> 1.1.0
+- Principios modificados: ninguno
+- Secciones modificadas: Restricciones Técnicas (base de datos), Governance (lista de enmiendas)
 - Secciones eliminadas: ninguna
+- Artefactos actualizados: spec.md (Assumptions), research.md (D3), tasks.md (T059)
 - TODOs diferidos: ninguno
+- Historial: (plantilla sin ratificar) -> 1.0.0 el 2026-10-09, principios I a VI
 -->
 # Agente SQL de Telemetría y Mantenimiento Industrial Constitution
 
@@ -55,7 +57,9 @@ Fundamento: el trabajo se defiende en un coloquio oral, y lo que no se puede exp
 - Orquestación del agente: LangGraph.
 - Modelo de lenguaje: Gemini mediante su capa gratuita. Los límites de uso de esa capa MUST
   tenerse en cuenta en el diseño (pocas llamadas por pregunta, reintentos con espera).
-- Base de datos relacional y almacén vectorial: PostgreSQL en Supabase con la extensión pgvector.
+- Base de datos relacional y almacén vectorial: PostgreSQL con la extensión pgvector. Puede ser un
+  servicio en la nube (por ejemplo Supabase) o un Postgres local con Docker. La conexión se define
+  por variables de entorno, sin cambios en el código.
 - Interfaz: Streamlit.
 - Todos los datos MUST ser sintéticos. No se usan datos reales de ninguna planta, empresa ni
   proyecto de terceros. Los documentos PDF son originales y ficticios.
@@ -78,4 +82,11 @@ elimina o redefine un principio, MINOR si se agrega un principio o se amplía un
 para aclaraciones de redacción. Antes de cerrar cada etapa del flujo se revisa que el
 resultado cumpla estos principios, y cualquier excepción se justifica por escrito en el plan.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-09 | **Last Amended**: 2026-10-09
+### Enmiendas
+
+- **1.1.0 (2026-10-12)**. Se amplió la restricción técnica de la base de datos. Antes exigía
+  "PostgreSQL en Supabase". Motivo: todo el desarrollo, las pruebas y la evaluación se hicieron
+  con el Postgres local de Docker, y Supabase no se llegó a probar. La restricción escrita no
+  describía el sistema real. Ningún principio cambió. Es MINOR porque amplía una regla.
+
+**Version**: 1.1.0 | **Ratified**: 2026-10-09 | **Last Amended**: 2026-10-12

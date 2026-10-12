@@ -4,7 +4,7 @@ asi que no gastan cuota ni requieren API key."""
 from __future__ import annotations
 
 from telemetry_agent.embeddings import HashEmbedder
-from telemetry_agent.graph import Agent
+from telemetry_agent.graph import Agent, quota_scope
 from telemetry_agent.llm import FakeLLM
 from telemetry_agent.models import RouteDecision, SynthesisOutput
 
@@ -70,6 +70,29 @@ def test_quota_error_is_reported_clearly_without_crashing():
     assert res.grounded is False
     assert "límite de uso" in res.answer
     assert res.error and "429" in res.error
+
+
+def test_daily_quota_error_says_it_is_the_daily_limit():
+    # Forma real del error de Gemini: el quotaId queda muy lejos del inicio del mensaje.
+    error = (
+        "Error calling model 'gemini-x' (RESOURCE_EXHAUSTED): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, "
+        "'message': '" + "x" * 400 + "', 'details': [{'violations': [{'quotaId': "
+        "'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaValue': '20'}]}]}}"
+    )
+    agent, _ = make_agent([RuntimeError(error)])
+    res = agent.ask("¿cuántas alarmas hubo?")
+    assert "límite diario" in res.answer
+    assert quota_scope(res.error) == "day"
+    assert "limite 20" in res.error
+
+
+def test_per_minute_quota_error_is_not_confused_with_the_daily_one():
+    error = "429 RESOURCE_EXHAUSTED {'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaValue': '5'}"
+    agent, _ = make_agent([RuntimeError(error)])
+    res = agent.ask("¿cuántas alarmas hubo?")
+    assert "en un minuto" in res.answer
+    assert quota_scope(res.error) == "minute"
+    assert quota_scope("connection reset") is None
 
 
 def test_docs_route_does_not_touch_the_database():

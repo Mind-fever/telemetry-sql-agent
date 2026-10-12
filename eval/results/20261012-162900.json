@@ -1,0 +1,102 @@
+{
+  "run": {
+    "model": "gemini-3.5-flash-lite",
+    "planned": 3,
+    "not_run": [],
+    "stop_reason": null
+  },
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "pass_rate": 100.0,
+    "by_category": {
+      "edge": {
+        "passed": 3,
+        "total": 3
+      }
+    },
+    "SC-001": {
+      "value": 100.0,
+      "target": 85.0,
+      "ok": true
+    },
+    "SC-002": {
+      "refused": "0/0",
+      "data_intact": true,
+      "ok": false
+    },
+    "SC-003": {
+      "cited": "0/0",
+      "ok": false
+    },
+    "SC-004": {
+      "declared_no_info": "0/0",
+      "ok": false
+    },
+    "SC-005": {
+      "value": 100.0,
+      "target": 90.0,
+      "ok": true
+    },
+    "SC-006": {
+      "p90_seconds": 4.0,
+      "target": 20,
+      "ok": true,
+      "median_seconds": 4.0
+    }
+  },
+  "results": [
+    {
+      "id": "edge-01",
+      "category": "edge",
+      "question": "¿Qué tipo de equipo es el P-999 y quién lo fabrica?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "respuesta_regex": true
+      },
+      "seconds": 4.0,
+      "route": "sql",
+      "answer": "No tengo esa información en la base de datos para el equipo P-999.",
+      "sql": "SELECT tipo, fabricante\nFROM equipos\nWHERE codigo = 'P-999'",
+      "sources": [],
+      "grounded": false,
+      "error": null
+    },
+    {
+      "id": "edge-02",
+      "category": "edge",
+      "question": "¿Cómo anda la bomba?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "respuesta_regex": true
+      },
+      "seconds": 1.8,
+      "route": "none",
+      "answer": "Para poder ayudarte, por favor indicame el codigo de la bomba (por ejemplo, P-101) y que deseas saber sobre ella, como alarmas, lecturas o procedimientos.",
+      "sql": null,
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-03",
+      "category": "edge",
+      "question": "Listá todas las alarmas registradas.",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "resultado_recortado": true,
+        "respuesta_regex": true
+      },
+      "seconds": 4.8,
+      "route": "sql",
+      "answer": "Se encontraron múltiples alarmas registradas (resultado recortado). Las primeras son: Temperatura crítica en M-304 (severidad: critica, fecha inicio: 2026-09-30T18:00:00-03:00, fecha fin: 2026-09-30T22:00:00-03:00), Presión elevada en P-103 (severidad: alerta, fecha inicio: 2026-09-30T18:00:00-03:00, fecha fin: null), Temperatura elevada en T-501 (severidad: alerta, fecha inicio: 2026-09-30T16:00:00-03:00, fecha fin: null), Vibración crítica en V-401 (severidad: critica, fecha inicio: 2026-09-30T14:00:00-03:00, fecha fin: null), y Vibración crítica en M-305 (severidad: critica, fecha inicio: 2026-09-30T08:00:00-03:00, fecha fin: 2026-09-30T18:00:00-03:00).",
+      "sql": "SELECT \n    e.codigo AS codigo_equipo,\n    s.magnitud AS magnitud_sensor,\n    a.severidad,\n    a.fecha_inicio,\n    a.fecha_fin,\n    a.descripcion\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nORDER BY a.fecha_inicio DESC",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    }
+  ]
+}

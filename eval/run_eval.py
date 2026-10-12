@@ -8,6 +8,7 @@ Para cada caso de eval/golden.jsonl:
 - Documentos: la fuente citada es el archivo y la pagina esperados, y la respuesta contiene el dato.
 - Rechazo: el pedido se rechaza y, al final, ninguna tabla cambio de cantidad de filas.
 - Sin evidencia: el agente declara que no tiene la informacion y no cita fuentes.
+- Casos borde: equipo que no existe, pregunta ambigua (pide precisar) y resultado recortado (lo avisa).
 
 Uso:
     python eval/run_eval.py --check-refs        muestra los valores de referencia (sin modelo, sin cuota)
@@ -27,6 +28,7 @@ import re
 import statistics
 import sys
 import time
+import unicodedata
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -35,11 +37,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from telemetry_agent.config import ALLOWED_TABLES, tracing_enabled  # noqa: E402
+from telemetry_agent.config import ALLOWED_TABLES, get_settings, tracing_enabled  # noqa: E402
 from telemetry_agent.db import connect_admin  # noqa: E402
+from telemetry_agent.graph import quota_scope  # noqa: E402
 
 GOLDEN = Path(__file__).with_name("golden.jsonl")
 RESULTS = Path(__file__).with_name("results")
+QUOTA_WAIT_SECONDS = 65  # el limite por minuto de la capa gratuita se libera en ese plazo
 
 # Umbrales de exito de la especificacion (spec.md, seccion Success Criteria).
 SC001_MIN_PASS = 0.85
@@ -64,12 +68,18 @@ def flatten(rows: list[tuple]) -> list[Any]:
     return [v for row in rows for v in row]
 
 
+def fold(text: Any) -> str:
+    """Minusculas y sin tildes: la base guarda 'vibracion' y el agente puede escribir 'vibración'."""
+    decomposed = unicodedata.normalize("NFD", str(text))
+    return "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn").strip().lower()
+
+
 def same_value(a: Any, b: Any) -> bool:
     if isinstance(a, bool) or isinstance(b, bool):
         return a == b
     if isinstance(a, (int, float)) and isinstance(b, (int, float)):
         return abs(float(a) - float(b)) < 0.011
-    return str(a).strip().lower() == str(b).strip().lower()
+    return fold(a) == fold(b)
 
 
 def rows_contain_values(agent_rows: list[dict] | None, ref_values: list[Any]) -> bool:
@@ -90,7 +100,7 @@ def text_mentions(answer: str, value: Any) -> bool:
         if num == int(num):
             forms |= {f"{int(num):,}".replace(",", "."), f"{int(num):,}"}
         return any(re.search(rf"(?<![\d.,]){re.escape(f)}(?![\d])", low) for f in forms)
-    return str(value).lower() in low
+    return fold(value) in fold(answer)
 
 
 def answer_has_values(answer: str, ref_values: list[Any]) -> bool:
@@ -125,6 +135,8 @@ def evaluate_case(case: dict, resp, ref_values: list[Any] | None) -> dict[str, b
         checks["filas_correctas"] = rows_contain_values(resp.rows, ref_values)
         if case.get("category") not in ("both",):
             checks["respuesta_menciona_valor"] = answer_has_values(answer, ref_values)
+    if case.get("expect_truncated"):
+        checks["resultado_recortado"] = bool(resp.rows_truncated) and resp.rows is not None
     if "expect_source" in case:
         want = case["expect_source"]
         checks["fuente_citada"] = any(
@@ -188,23 +200,39 @@ def main() -> None:
 
         client = Client()
 
-    results: list[dict] = []
-    for i, case in enumerate(cases):
+    def run_case(case: dict):
         thread = uuid.uuid4().hex
-        turns = case.get("turns") or [case["question"]]
         started = time.perf_counter()
         error = None
         resp = None
         run_id = None
         try:
             with collect_runs() as cb:
-                for turn in turns:
+                for turn in case.get("turns") or [case["question"]]:
                     resp = agent.ask(turn, thread, metadata={"case_id": case["id"]}, tags=["eval", case["category"]])
                 if cb.traced_runs:
                     run_id = cb.traced_runs[-1].id
         except Exception as exc:  # noqa: BLE001
             error = str(exc).splitlines()[0][:300]
-        elapsed = time.perf_counter() - started
+        return resp, error, time.perf_counter() - started, run_id
+
+    results: list[dict] = []
+    stop_reason = None
+    for i, case in enumerate(cases):
+        turns = case.get("turns") or [case["question"]]
+        resp, error, elapsed, run_id = run_case(case)
+
+        # Un error de cuota no dice nada sobre el agente: no se cuenta como caso fallado.
+        scope = quota_scope(error or getattr(resp, "error", None))
+        if scope == "minute":
+            print(f"  limite por minuto en {case['id']}: espero {QUOTA_WAIT_SECONDS} s y reintento el caso")
+            time.sleep(QUOTA_WAIT_SECONDS)
+            resp, error, elapsed, run_id = run_case(case)
+            scope = quota_scope(error or getattr(resp, "error", None))
+        if scope:
+            stop_reason = (error or resp.error or "")[-120:]
+            print(f"  corte por cuota ({scope}) en {case['id']}: {stop_reason}")
+            break
 
         ref_values = flatten(refs[case["id"]]) if case["id"] in refs else None
         checks = evaluate_case(case, resp, ref_values) if resp is not None else {"sin_error_tecnico": False}
@@ -235,12 +263,20 @@ def main() -> None:
     intact = before == after
 
     summary = summarize(results, intact)
+    done = {r["id"] for r in results}
+    run_info = {
+        "model": get_settings().gemini_model,
+        "planned": len(cases),
+        "not_run": [c["id"] for c in cases if c["id"] not in done],
+        "stop_reason": stop_reason,
+    }
     RESULTS.mkdir(exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     (RESULTS / f"{stamp}.json").write_text(
-        json.dumps({"summary": summary, "results": results}, ensure_ascii=False, indent=2), encoding="utf-8"
+        json.dumps({"run": run_info, "summary": summary, "results": results}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
     )
-    md = to_markdown(summary, results)
+    md = to_markdown(summary, results, run_info)
     (RESULTS / "latest.md").write_text(md, encoding="utf-8")
     print("\n" + md)
 
@@ -280,13 +316,24 @@ def summarize(results: list[dict], data_intact: bool) -> dict:
     }
 
 
-def to_markdown(summary: dict, results: list[dict]) -> str:
+def to_markdown(summary: dict, results: list[dict], run_info: dict | None = None) -> str:
     def mark(ok: bool) -> str:
         return "cumple" if ok else "NO cumple"
+
+    run_lines: list[str] = []
+    if run_info:
+        run_lines = [f"Modelo: `{run_info['model']}`. Casos ejecutados: {summary['total']} de {run_info['planned']}.", ""]
+        if run_info["not_run"]:
+            run_lines += [
+                "**Corrida incompleta**: se cortó por la cuota del modelo. Los criterios de abajo se calculan "
+                "solo sobre los casos ejecutados. Sin ejecutar: " + ", ".join(run_info["not_run"]) + ".",
+                "",
+            ]
 
     lines = [
         f"# Resultado de la evaluación ({datetime.now().strftime('%Y-%m-%d %H:%M')})",
         "",
+        *run_lines,
         f"Casos aprobados: **{summary['passed']}/{summary['total']}** ({summary['pass_rate']}%).",
         "",
         "| Criterio | Resultado | Estado |",

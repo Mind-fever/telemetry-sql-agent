@@ -62,6 +62,10 @@ MESSAGES = {
         "es": "Se alcanzó el límite de uso del modelo de lenguaje (capa gratuita). Probá de nuevo en un minuto.",
         "en": "The language model usage limit was reached (free tier). Please try again in a minute.",
     },
+    "quota_day": {
+        "es": "Se alcanzó el límite diario de uso del modelo de lenguaje (capa gratuita). Se renueva al día siguiente.",
+        "en": "The daily usage limit of the language model was reached (free tier). It resets the next day.",
+    },
 }
 
 
@@ -107,11 +111,34 @@ def _message(key: str, language: str, **kw: str) -> str:
     return MESSAGES[key].get(language, MESSAGES[key]["es"]).format(**kw)
 
 
+_QUOTA_ID = re.compile(r"quotaId['\"]: ['\"]([^'\"]+)")
+_QUOTA_VALUE = re.compile(r"quotaValue['\"]: ['\"](\d+)")
+
+
+def quota_scope(text: str | None) -> str | None:
+    """Que limite de la capa gratuita se alcanzo: "day", "minute", o None si no es un error de cuota.
+
+    Gemini lo informa en el campo quotaId del error, por ejemplo
+    GenerateRequestsPerDayPerProjectPerModel-FreeTier.
+    """
+    if not text or not any(k in text for k in ("429", "RESOURCE_EXHAUSTED", "quota", "Quota")):
+        return None
+    return "day" if "PerDay" in text else "minute"
+
+
 def _friendly_error(exc: Exception) -> tuple[str, bool]:
     """Devuelve (detalle corto, es_error_de_cuota)."""
     text = str(exc)
-    quota = any(k in text for k in ("429", "RESOURCE_EXHAUSTED", "quota", "Quota"))
-    return text.splitlines()[0][:300] if text else exc.__class__.__name__, quota
+    detail = text.splitlines()[0][:300] if text else exc.__class__.__name__
+    scope = quota_scope(text)
+    if scope:
+        # El detalle se recorta, asi que se le agrega el limite alcanzado para no perderlo.
+        ids, values = _QUOTA_ID.findall(text), _QUOTA_VALUE.findall(text)
+        pick = next((i for i, q in enumerate(ids) if "PerDay" in q), 0)
+        if ids:
+            limit = f", limite {values[pick]}" if pick < len(values) else ""
+            detail += f" [cuota: {ids[pick]}{limit}]"
+    return detail, scope is not None
 
 
 def _with_history(state: AgentState, answer: str) -> list[dict[str, str]]:
@@ -259,7 +286,12 @@ def build_graph(
             if state.get("sql_gave_up"):
                 db_evidence = "La consulta a la base de datos fallo y no se pudo obtener el dato."
             else:
-                payload = {"columnas": state.get("columns", []), "filas": (state.get("rows") or [])[:MAX_EVIDENCE_ROWS]}
+                # La consulta va como contexto: sin ella la sintesis no sabe que filtros ya cumplen las filas.
+                payload = {
+                    "consulta": state.get("sql"),
+                    "columnas": state.get("columns", []),
+                    "filas": (state.get("rows") or [])[:MAX_EVIDENCE_ROWS],
+                }
                 note = " (resultado recortado: hay mas filas que las mostradas)" if state.get("rows_truncated") else ""
                 db_evidence = json.dumps(payload, ensure_ascii=False, default=str) + note
         else:
@@ -304,7 +336,7 @@ def build_graph(
         detail = state.get("error") or ""
         language = state.get("language", "es")
         if detail.startswith("QUOTA:"):
-            answer = _message("quota", language)
+            answer = _message("quota_day" if quota_scope(detail) == "day" else "quota", language)
         else:
             answer = _message("error", language, detail=detail)
         return {"answer": answer, "grounded": False, "sources": [], "history": _with_history(state, answer)}

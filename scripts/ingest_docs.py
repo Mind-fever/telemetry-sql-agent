@@ -88,14 +88,16 @@ def main() -> None:
     with connect_admin() as conn:
         with conn.cursor() as cur:
             cur.execute("truncate doc_chunks restart identity")
-            for c, v in zip(chunks, vectors):
+            # strict: si faltara un vector, falla en vez de descartar fragmentos sin avisar.
+            for c, v in zip(chunks, vectors, strict=True):
                 cur.execute(
                     "insert into doc_chunks (archivo, pagina, orden, texto, embedding) "
                     "values (%s, %s, %s, %s, %s::vector)",
                     (c["archivo"], c["pagina"], c["orden"], c["texto"], vector_literal(v)),
                 )
+            stored = cur.execute("select count(*) from doc_chunks").fetchone()[0]
         conn.commit()
-    print("Fragmentos cargados en doc_chunks.")
+    print(f"{stored} fragmentos cargados en doc_chunks.")
 
 
 if __name__ == "__main__":
