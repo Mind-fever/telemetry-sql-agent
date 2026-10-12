@@ -132,5 +132,6 @@ punto a comprobar durante la implementación, con la acción que lo resuelve.
 El esquema, el seed, el validador de SQL, el ingestado de PDF, el recorte en fragmentos y la
 lógica del grafo se prueban con pruebas automáticas usando un modelo y un generador de
 embeddings falsos y deterministas. Lo que requiere la API key (calidad real de las respuestas,
-puntaje de la evaluación, trazas en LangSmith) lo ejecuta el usuario con su propia clave, y esos
-resultados son la evidencia del informe.
+puntaje de la evaluación, trazas en LangSmith) se ejecuta aparte con las claves reales, y esos
+resultados son la evidencia del informe. Esas corridas se hicieron entre el 10 y el 12 de octubre
+de 2026 y están en `eval/results/`.

@@ -33,4 +33,4 @@
 
 - La sección Assumptions menciona la capa gratuita del modelo de lenguaje y el servicio en la nube de la base. Se dejó ahí porque son restricciones del contexto del trabajo y no decisiones de diseño; las elecciones concretas de tecnología se toman en el plan.
 - FR-016 nombra la metodología Spec Driven Development porque es un requisito del enunciado para la promoción, no un detalle de implementación.
-- Sin marcadores de aclaración: los puntos abiertos (dominio, lenguaje, modelo, criterios de promoción) ya fueron resueltos con el usuario antes de redactar.
+- Sin marcadores de aclaración: los puntos abiertos (dominio, lenguaje, modelo, criterios de promoción) se resolvieron antes de redactar.
