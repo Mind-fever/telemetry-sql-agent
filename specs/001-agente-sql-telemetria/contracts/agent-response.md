@@ -15,7 +15,7 @@ en los tres.
 | Campo | Tipo | Descripción |
 |---|---|---|
 | answer | texto | respuesta final, en el idioma de la pregunta |
-| route | `sql`, `docs`, `both` o `none` | fuente que decidió usar el router |
+| route | `sql`, `docs`, `both`, `none` o `refuse` | fuente que decidió usar el router; `refuse` es un pedido rechazado |
 | route_reason | texto | justificación corta del router |
 | sql | texto o nulo | consulta ejecutada, si se usó la base |
 | rows | lista de filas o nulo | filas devueltas, ya acotadas |

@@ -179,6 +179,8 @@ Surgieron al revisar cada criterio del enunciado contra el repositorio y la base
 - [X] T065 Agregar al informe la captura de una traza de LangSmith y el nombre del autor, y volver a generar el PDF. El PDF quedó en 9 páginas sin la portada
 - [X] T066 (corrida del 2026-10-12: experimento `gemini-3.5-flash-lite-df68c2a4`, 38/38) Usar la evaluación propia de LangSmith además del script local: subir los 38 casos como conjunto de datos y correr el agente como un experimento, con las mismas verificaciones deterministas, en `eval/run_langsmith_experiment.py`. Refuerza el criterio de promoción "observabilidad y evaluación"
 
+- [X] T067 Corregir inconsistencias entre los artefactos y el código encontradas en la revisión final: el contrato y el diagrama del plan nombraban 4 rutas y el router tiene 5 (faltaba `refuse`); `data-model.md` escribía el turno "mañana" y la base guarda `manana`; la estructura de carpetas del plan no incluía los archivos agregados en las fases 10 y 11
+
 ---
 
 ## Dependencies & Execution Order

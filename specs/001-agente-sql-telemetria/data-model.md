@@ -23,8 +23,8 @@ Volumen real del seed: 18 filas.
 |---|---|---|
 | id | serial PK | |
 | nombre | text | nombres inventados |
-| especialidad | text | mecánica, eléctrica, instrumentación, lubricación |
-| turno | text | mañana, tarde, noche |
+| especialidad | text | mecanica, electrica, instrumentacion, lubricacion |
+| turno | text | manana, tarde, noche (sin tilde ni eñe, como todos los valores de opciones fijas) |
 | fecha_ingreso | date | |
 
 Volumen real del seed: 20 filas.

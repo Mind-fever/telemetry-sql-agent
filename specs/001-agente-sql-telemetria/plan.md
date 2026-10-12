@@ -59,8 +59,8 @@ hace falta la tabla de complejidad.
 ```text
 pregunta + historial
         |
-     [router]  ->  decide: sql | docs | both | none
-        |
+     [router]  ->  decide: sql | docs | both | none | refuse
+        |          (none y refuse responden directo, sin consultar ninguna fuente)
    +----+-----------------+
    |                      |
 [sql_generate]        [retrieve]
@@ -119,7 +119,8 @@ specs/001-agente-sql-telemetria/
 ├── docker-compose.yml          # Postgres con pgvector local, opcional
 ├── db/
 │   ├── schema.sql              # tablas, comentarios, doc_chunks
-│   └── roles.sql               # rol agent_ro de solo lectura
+│   ├── roles.sql               # rol agent_ro de solo lectura
+│   └── dump/                   # volcado de los datos, agregado en la fase 11 (T062)
 ├── scripts/
 │   ├── setup_db.py             # crea esquema y rol de solo lectura
 │   ├── seed.py                 # datos sintéticos con semilla fija
@@ -143,8 +144,11 @@ specs/001-agente-sql-telemetria/
 │   └── streamlit_app.py
 ├── eval/
 │   ├── golden.jsonl
-│   └── run_eval.py
+│   ├── run_eval.py
+│   ├── run_langsmith_experiment.py   # agregado en la fase 11 (T066)
+│   └── results/                      # resultados de las corridas reales
 ├── tests/
+│   ├── test_embeddings.py            # agregado en la fase 10 (T050)
 │   ├── test_sql_guard.py
 │   ├── test_seed_integrity.py
 │   ├── test_chunking.py
