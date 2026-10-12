@@ -181,6 +181,8 @@ Surgieron al revisar cada criterio del enunciado contra el repositorio y la base
 
 - [X] T067 Corregir inconsistencias entre los artefactos y el código encontradas en la revisión final: el contrato y el diagrama del plan nombraban 4 rutas y el router tiene 5 (faltaba `refuse`); `data-model.md` escribía el turno "mañana" y la base guarda `manana`; la estructura de carpetas del plan no incluía los archivos agregados en las fases 10 y 11
 
+- [X] T068 Revisar el README completo: quitar los consejos sobre Supabase, que nunca se probó; dar los comandos de instalación para Windows además de Linux y macOS; ordenar las secciones; agregar el resultado de la evaluación; y probar el comando de carga del volcado en una base aparte antes de documentarlo
+
 ---
 
 ## Dependencies & Execution Order

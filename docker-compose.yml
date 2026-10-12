@@ -1,5 +1,4 @@
-# Postgres local con pgvector. Es opcional: sirve para reproducir el proyecto sin cuenta en la nube
-# y como respaldo si el proyecto gratuito de Supabase esta pausado.
+# Postgres local con pgvector. Es la base con la que se desarrollo, probo y evaluo el proyecto.
 services:
   db:
     image: pgvector/pgvector:pg16

@@ -6,7 +6,8 @@ la implementación.
 ## Requisitos previos
 
 - Python 3.11 o superior.
-- Una base PostgreSQL con pgvector: un proyecto de Supabase o `docker compose up -d db`.
+- Una base PostgreSQL con pgvector: `docker compose up -d db`. La validación se hizo con esta
+  base local; la opción de un proyecto de Supabase quedó prevista pero no se probó.
 - Una API key de Gemini y, para las trazas, una API key de LangSmith.
 - Un archivo `.env` copiado de `.env.example` con `DATABASE_URL`, `DATABASE_URL_RO`,
   `GEMINI_API_KEY`, `LANGSMITH_API_KEY` y `LANGSMITH_PROJECT`.
