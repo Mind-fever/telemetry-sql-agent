@@ -176,6 +176,9 @@ Surgieron al revisar cada criterio del enunciado contra el repositorio y la base
 - [X] T063 Indicar en `README.md` dónde están el informe, las capturas y el resultado de la evaluación
 - [X] T064 Correr la evaluación completa con los casos nuevos, actualizar el informe y versionar los cambios en la rama `001-agente-sql-telemetria`. Quinta corrida, 2026-10-12: 38/38 con `gemini-3.5-flash-lite`. El informe quedó en 8 páginas (`docs/informe/informe.pdf`)
 
+- [X] T065 Agregar al informe la captura de una traza de LangSmith y el nombre del autor, y volver a generar el PDF. El PDF quedó en 9 páginas sin la portada
+- [X] T066 (corrida del 2026-10-12: experimento `gemini-3.5-flash-lite-df68c2a4`, 38/38) Usar la evaluación propia de LangSmith además del script local: subir los 38 casos como conjunto de datos y correr el agente como un experimento, con las mismas verificaciones deterministas, en `eval/run_langsmith_experiment.py`. Refuerza el criterio de promoción "observabilidad y evaluación"
+
 ---
 
 ## Dependencies & Execution Order

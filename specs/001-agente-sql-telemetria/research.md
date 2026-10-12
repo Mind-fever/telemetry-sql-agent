@@ -110,6 +110,10 @@ punto a comprobar durante la implementación, con la acción que lo resuelve.
   confirma que eso aplique al plan Developer.
 - **Consecuencia**: una corrida completa de evaluación consume pocas trazas, pero las capturas
   para el informe se toman en el momento y no se confía en verlas semanas después.
+- **Actualización del 2026-10-12 (verificado con la API key real)**: con el plan gratuito
+  funcionaron las trazas, el feedback por traza, la creación de un conjunto de datos con los 38
+  casos y un experimento sobre ese conjunto (`eval/run_langsmith_experiment.py`), que dio 38 de 38.
+  El experimento usa las mismas verificaciones deterministas que `eval/run_eval.py`.
 - **Por qué verificaciones deterministas**: comparar el resultado de la consulta generada con el de
   una consulta de referencia, y comprobar el archivo y la página citados, es reproducible y se
   puede explicar en el coloquio. Un juez basado en modelo agrega variabilidad y consumo de cuota.

@@ -15,7 +15,7 @@ Solo lee: nunca modifica la base.
 | 3 PDF ficticios para el RAG | `data/docs/` (se regeneran con `scripts/build_pdfs.py`) |
 | Agente con LangGraph (decide la fuente, genera y valida SQL, recupera fragmentos) | `src/telemetry_agent/graph.py` |
 | Interfaz de chat con Streamlit | `app/streamlit_app.py` |
-| Trazas y evaluación con LangSmith | `eval/run_eval.py`, variables `LANGSMITH_*` |
+| Trazas y evaluación con LangSmith | `eval/run_eval.py`, `eval/run_langsmith_experiment.py`, variables `LANGSMITH_*` |
 | Spec Driven Development con GitHub Spec Kit | `.specify/` y `specs/001-agente-sql-telemetria/` |
 | Pruebas automáticas | `tests/` |
 
@@ -60,6 +60,7 @@ python -m telemetry_agent.cli "¿Cuántas alarmas críticas hubo en septiembre?"
 # 6. Evaluar
 python eval/run_eval.py --check-refs # valores de referencia, sin modelo
 python eval/run_eval.py              # corre los 38 casos; el resultado queda en eval/results/
+python eval/run_langsmith_experiment.py   # lo mismo como experimento de LangSmith (Datasets & Experiments)
 ```
 
 ### Cargar los datos desde el volcado (alternativa al paso de seed e ingesta)
