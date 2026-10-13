@@ -208,6 +208,12 @@ Tareas que salen del análisis:
 - [X] T077 Agregar una prueba automática del manejo de cuota de la evaluación (reintento ante el límite por minuto, corte ante el diario), que no tenía ninguna (C1), en `eval/run_eval.py` y `tests/test_eval_helpers.py`
 - [X] T078 Correr la evaluación completa con el caso nuevo, actualizar el informe y publicar. Sexta corrida, 2026-10-12: 39/39 con `gemini-3.5-flash-lite`, y 39/39 en el experimento de LangSmith `gemini-3.5-flash-lite-49276dc0`. Pruebas automáticas: 98. El informe quedó en 10 páginas con portada
 
+Repaso del plan. El 12 y el 13 de octubre el autor repasó una por una las ocho decisiones técnicas de
+`research.md` (modelo, embeddings, base de datos, LangGraph, capas de solo lectura, evaluación,
+LangSmith y Streamlit). No pidió cambiar ninguna, así que no generó tareas de código.
+
+- [X] T079 Escribir una guía de los datos y de la demostración, con el contenido real de cada tabla y de cada PDF y con preguntas probadas con el modelo real, en `docs/guia-demo.md`
+
 ---
 
 ## Dependencies & Execution Order

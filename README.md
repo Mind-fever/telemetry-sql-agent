@@ -159,6 +159,7 @@ Se usó GitHub Spec Kit. Los artefactos, en el orden en que se generaron:
 | Capturas de la interfaz y de una traza de LangSmith | `docs/informe/capturas/` |
 | Resultado de la última evaluación | `eval/results/latest.md` (el detalle por caso está en el `.json` de la misma carpeta) |
 | Casos de evaluación y respuestas esperadas | `eval/golden.jsonl` |
+| Guía de los datos y de la demostración | `docs/guia-demo.md` |
 | Enunciado del trabajo | `docs/Enunciado.pdf` |
 
 ## Datos y documentos
