@@ -156,22 +156,36 @@ def evaluate_case(case: dict, resp, ref_values: list[Any] | None) -> dict[str, b
     return checks
 
 
-def run_with_quota_retry(run_case, case: dict, sleep=time.sleep):
-    """Corre un caso cuidando la cuota del modelo.
+def stop_scope(error: str | None) -> str | None:
+    """Motivo por el que un caso no se pudo correr por causas ajenas al agente.
 
-    run_case(case) devuelve (respuesta, error, segundos, run_id). Ante el limite por minuto se
-    espera y se reintenta una sola vez. Devuelve ese resultado y el limite que quedo sin resolver
-    ("day", "minute" o None). Si no es None hay que cortar la corrida: un error de cuota no dice
-    nada sobre el agente y no se cuenta como caso fallado.
+    "day" o "minute" si se alcanzo un limite de cuota, "service" si el servicio del modelo no
+    estaba disponible (errores 503 y 504), None si el caso corrio.
+    """
+    scope = quota_scope(error)
+    if scope:
+        return scope
+    if error and any(k in error for k in ("503", "UNAVAILABLE", "504", "DEADLINE_EXCEEDED")):
+        return "service"
+    return None
+
+
+def run_with_quota_retry(run_case, case: dict, sleep=time.sleep):
+    """Corre un caso cuidando la cuota y la disponibilidad del modelo.
+
+    run_case(case) devuelve (respuesta, error, segundos, run_id). Ante el limite por minuto o una
+    caida del servicio se espera y se reintenta una sola vez. Devuelve ese resultado y el motivo
+    que quedo sin resolver ("day", "minute", "service" o None). Si no es None hay que cortar la
+    corrida: esos errores no dicen nada sobre el agente y no se cuentan como casos fallados.
     """
     def scope_of(outcome) -> str | None:
         resp, error = outcome[0], outcome[1]
-        return quota_scope(error or getattr(resp, "error", None))
+        return stop_scope(error or getattr(resp, "error", None))
 
     outcome = run_case(case)
     scope = scope_of(outcome)
-    if scope == "minute":
-        print(f"  limite por minuto en {case['id']}: espero {QUOTA_WAIT_SECONDS} s y reintento el caso")
+    if scope in ("minute", "service"):
+        print(f"  {scope} en {case['id']}: espero {QUOTA_WAIT_SECONDS} s y reintento el caso")
         sleep(QUOTA_WAIT_SECONDS)
         outcome = run_case(case)
         scope = scope_of(outcome)
@@ -250,7 +264,7 @@ def main() -> None:
         (resp, error, elapsed, run_id), scope = run_with_quota_retry(run_case, case)
         if scope:
             stop_reason = (error or resp.error or "")[-120:]
-            print(f"  corte por cuota ({scope}) en {case['id']}: {stop_reason}")
+            print(f"  corte ({scope}) en {case['id']}: {stop_reason}")
             break
 
         ref_values = flatten(refs[case["id"]]) if case["id"] in refs else None
@@ -344,7 +358,7 @@ def to_markdown(summary: dict, results: list[dict], run_info: dict | None = None
         run_lines = [f"Modelo: `{run_info['model']}`. Casos ejecutados: {summary['total']} de {run_info['planned']}.", ""]
         if run_info["not_run"]:
             run_lines += [
-                "**Corrida incompleta**: se cortó por la cuota del modelo. Los criterios de abajo se calculan "
+                "**Corrida incompleta**: se cortó por la cuota o por una caída del servicio del modelo. Los criterios de abajo se calculan "
                 "solo sobre los casos ejecutados. Sin ejecutar: " + ", ".join(run_info["not_run"]) + ".",
                 "",
             ]

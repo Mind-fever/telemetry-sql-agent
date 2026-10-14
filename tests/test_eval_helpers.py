@@ -145,6 +145,27 @@ def test_per_minute_quota_twice_in_a_row_stops_the_run():
     assert scope == "minute" and len(calls) == 2
 
 
+SERVICE = "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand.'}}"
+
+
+def test_service_outage_is_not_a_quota_error_but_also_stops_the_run():
+    assert ev.stop_scope(SERVICE) == "service"
+    assert ev.stop_scope("504 DEADLINE_EXCEEDED. Deadline expired") == "service"
+    assert ev.stop_scope(DAY) == "day" and ev.stop_scope(MINUTE) == "minute"
+    assert ev.stop_scope(None) is None and ev.stop_scope("syntax error at or near") is None
+
+
+def test_service_outage_waits_and_retries_once_then_stops():
+    run_case, calls = _quota_runner([SERVICE, None])
+    waits = []
+    _, scope = ev.run_with_quota_retry(run_case, {"id": "c"}, sleep=waits.append)
+    assert scope is None and len(calls) == 2 and waits == [ev.QUOTA_WAIT_SECONDS]
+
+    run_case, calls = _quota_runner([SERVICE, SERVICE])
+    _, scope = ev.run_with_quota_retry(run_case, {"id": "c"}, sleep=lambda s: None)
+    assert scope == "service" and len(calls) == 2
+
+
 def test_summary_computes_success_criteria():
     results = [
         {"id": "a", "category": "sql", "passed": True, "checks": {"ruta": True}, "seconds": 3.0, "route": "sql", "sources": [], "grounded": True},

@@ -32,7 +32,6 @@ import run_eval as ev  # noqa: E402
 
 from telemetry_agent.config import get_settings  # noqa: E402
 from telemetry_agent.db import connect_admin  # noqa: E402
-from telemetry_agent.graph import quota_scope  # noqa: E402
 from telemetry_agent.models import AgentResponse  # noqa: E402
 
 DATASET = "agente-sql-telemetria-golden"
@@ -98,11 +97,11 @@ def main() -> None:
     def target(inputs: dict) -> dict:
         time.sleep(args.delay)
         resp = ask_all(inputs["turns"])
-        if quota_scope(resp.error) == "minute":
+        if ev.stop_scope(resp.error) in ("minute", "service"):
             time.sleep(ev.QUOTA_WAIT_SECONDS)
             resp = ask_all(inputs["turns"])
-        if quota_scope(resp.error):
-            raise RuntimeError(f"Cuota del modelo agotada: {resp.error[-120:]}")
+        if ev.stop_scope(resp.error):
+            raise RuntimeError(f"Modelo no disponible ({ev.stop_scope(resp.error)}): {resp.error[-120:]}")
         return resp.model_dump()
 
     def checks(run, example) -> list[dict]:
