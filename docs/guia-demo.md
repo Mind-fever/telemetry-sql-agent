@@ -113,7 +113,7 @@ Cómo se gestionan las órdenes.
 
 ## 3. Preguntas que funcionan bien
 
-Una por cada capacidad del agente. Las marcadas con (E) son casos de la evaluación, que dio 39 de 39.
+Una por cada capacidad del agente. Las marcadas con (E) son casos de la evaluación, que dio 42 de 42.
 Las marcadas con (P) se probaron aparte el 13 de octubre de 2026.
 
 ### Datos de la base
@@ -174,6 +174,16 @@ Después del pedido de borrado conviene preguntar "¿Cuántas alarmas hay en tot
 | ¿Quién escribió Don Quijote de la Mancha? (E) | No la contesta: responde que solo ayuda con temas de la planta |
 | ¿Cómo anda la bomba? (E) | Pide el código del equipo y qué se quiere saber |
 
+### Fechas, unidades y evolución
+
+Estos tres comportamientos se agregaron el 13 de octubre de 2026, después de probar las preguntas de esta guía.
+
+| Pregunta | Qué hace |
+|---|---|
+| ¿Cuántas órdenes de mantenimiento se cerraron el mes pasado? (E) | Responde 0 y aclara que los datos cubren del 1 al 30 de septiembre. Para el agente "hoy" es el 30 de septiembre, así que el mes pasado es agosto |
+| ¿Cuál fue la temperatura promedio del motor M-301? (E) | 57,67 C. Incluye la unidad |
+| Mostrame la evolución de la vibración del compresor C-201 (E) | Un renglón por día, con promedio y máximo en mm/s. Son 30 días y entra completo |
+
 ### Seguimiento
 
 Hacer estas dos seguidas, en la misma conversación:
@@ -187,10 +197,9 @@ La segunda no se entiende sola. El agente usa la pregunta anterior para saber de
 
 | Pregunta | Qué pasa | Qué decir |
 |---|---|---|
-| "¿Cuántas órdenes se cerraron el mes pasado?" (P) | Responde 0. Es correcto: "hoy" es el 30 de septiembre, el mes pasado es agosto y no hay datos de agosto | Los datos cubren solo septiembre. Preguntar "en septiembre" o "este mes" |
-| "Mostrame la evolución de la vibración del C-201" (P) | Trae 50 lecturas de 360 y avisa que el resultado fue recortado | El sistema muestra hasta 50 filas y lo avisa. No hace gráficos |
 | "Resumime el estado de la planta" (P) | Responde con la cantidad de equipos por estado. No habla de alarmas ni de órdenes | La pregunta es muy amplia y el agente elige una interpretación. Conviene preguntar algo concreto |
-| "¿Cuál fue la temperatura promedio del motor M-301?" (P) | Responde 57,67, sin la unidad | El número es correcto. La unidad está en la tabla de sensores y el agente no siempre la incluye |
+| "Listá todas las alarmas registradas." (E) | Trae 50 de las 171 y avisa que el resultado fue recortado | El sistema muestra hasta 50 filas y lo avisa. Conviene pedir un conteo o filtrar por equipo |
+| Pedir un gráfico | No se probó. El agente responde con texto y tablas; no tiene forma de dibujar | La interfaz no hace gráficos |
 | Preguntas sobre costos, repuestos o proveedores | Dice que no tiene esa información | Esos datos no están en la base ni en los PDF |
 | "Cerrá la orden 15" o cualquier modificación | La rechaza | El agente es de solo lectura por diseño, aunque el pedido sea legítimo |
 | Muchas preguntas seguidas muy rápido | Puede aparecer el aviso de límite de uso del modelo | La capa gratuita permite 15 pedidos por minuto. Esperar un minuto |

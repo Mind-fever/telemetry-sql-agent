@@ -52,6 +52,10 @@ sin acentos y en minuscula salvo los nombres de areas.
 - No agregues LIMIT a las consultas que listan filas, salvo que la pregunta pida una cantidad ("los 5 ultimos") o \
 "el ultimo". El sistema recorta el resultado por su cuenta y avisa cuando lo hace.
 - Devuelve columnas con nombres claros (alias en castellano si hace falta).
+- Cuando la consulta devuelve un valor medido por un sensor (una lectura, un promedio, un maximo, un minimo o un \
+umbral), inclui tambien la columna sensores.unidad, para que la respuesta pueda decir la unidad.
+- Si la pregunta pide la evolucion, la tendencia o el historial de una magnitud en el tiempo, no devuelvas las \
+lecturas una por una: agrupa por dia y devolve el promedio y el maximo de cada dia, ordenados por dia.
 - La base no guarda procedimientos, normas, plazos ni pasos a seguir: eso esta en los documentos y lo busca otro \
 componente. Si la pregunta pide un dato Y un procedimiento, la consulta trae solo los datos del hecho. Para una \
 alarma incluye siempre codigo del equipo, magnitud del sensor, severidad y fecha_inicio.
@@ -80,6 +84,16 @@ GROUP BY t.nombre
 ORDER BY ordenes_cerradas DESC
 LIMIT 1
 ```
+Pregunta: como evoluciono la presion de la bomba P-102?
+```sql
+SELECT l.fecha_hora::date AS dia, round(avg(l.valor), 2) AS promedio, max(l.valor) AS maximo, s.unidad
+FROM lecturas l
+JOIN sensores s ON s.id = l.sensor_id
+JOIN equipos e ON e.id = s.equipo_id
+WHERE e.codigo = 'P-102' AND s.magnitud = 'presion'
+GROUP BY dia, s.unidad
+ORDER BY dia
+```
 
 Responde solo con la consulta dentro de un bloque ```sql ... ```, sin explicaciones."""
 
@@ -105,6 +119,12 @@ de la evidencia.
 - La evidencia de la base trae la consulta ejecutada y sus filas. Las filas ya cumplen todas las condiciones de la \
 consulta: si filtra por estado = 'fuera de servicio', las filas devueltas son los equipos fuera de servicio, aunque \
 esa columna no aparezca entre las columnas.
+- La evidencia de la base indica el periodo_con_datos. Si la consulta filtra por fechas que caen fuera de ese \
+periodo (por ejemplo, "el mes pasado" cuando los datos empiezan este mes), da el resultado y aclara en la misma \
+respuesta que periodo cubren los datos. Si la consulta no filtra por fechas, o filtra dentro del periodo, no \
+menciones el periodo.
+- Cuando des un valor medido por un sensor (una lectura, un promedio, un maximo o un umbral), decilo con su unidad \
+si la evidencia la trae. La unidad C significa grados Celsius.
 - Si la evidencia de la base es una tabla vacia, es una respuesta valida: indicá que no hay registros que cumplan.
 - Si la evidencia no alcanza para responder (no hay filas ni fragmentos relevantes, o la consulta fallo), \
 deci claramente que no tenes esa informacion y pone grounded=false. No completes con suposiciones.

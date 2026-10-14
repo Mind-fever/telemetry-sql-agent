@@ -87,6 +87,20 @@ def build_schema_context() -> str:
     return "\n".join(lines).strip()
 
 
+def data_period() -> str:
+    """Periodo que cubren los datos, como 'AAAA-MM-DD a AAAA-MM-DD' (primera y ultima lectura).
+
+    La sintesis lo usa para avisar cuando una pregunta cae fuera de ese periodo (FR-017).
+    """
+    with connect_readonly() as conn:
+        lo, hi = conn.execute(
+            "select min(fecha_hora) at time zone %s, max(fecha_hora) at time zone %s from lecturas",
+            (TIMEZONE, TIMEZONE),
+        ).fetchone()
+        conn.rollback()
+    return f"{lo.date().isoformat()} a {hi.date().isoformat()}" if lo and hi else ""
+
+
 def reference_date() -> str:
     """Fecha de referencia de los datos (la ultima lectura), en formato ISO."""
     with connect_readonly() as conn:

@@ -117,7 +117,9 @@ reales están marcados como "Actualización" con su fecha, y esos sí salen de u
   para el informe se toman en el momento y no se confía en verlas semanas después.
 - **Actualización del 2026-10-12 (verificado con la API key real)**: con el plan gratuito
   funcionaron las trazas, el feedback por traza, la creación de un conjunto de datos con los 38
-  casos y un experimento sobre ese conjunto (`eval/run_langsmith_experiment.py`), que dio 38 de 38. Tras agregar un caso más, el mismo día, dio 39 de 39.
+  casos y un experimento sobre ese conjunto (`eval/run_langsmith_experiment.py`), que dio 38 de 38. Tras agregar un caso más, el mismo día, dio 39 de 39. El 2026-10-13, con 42 casos, dio 41 de 42: el modelo
+  escribió una consulta distinta para un caso combinado y la verificación de filas no la aceptó, aunque
+  la respuesta era correcta. Las dos corridas locales de ese día dieron 42 de 42.
   El experimento usa las mismas verificaciones deterministas que `eval/run_eval.py`.
 - **Por qué verificaciones deterministas**: comparar el resultado de la consulta generada con el de
   una consulta de referencia, y comprobar el archivo y la página citados, es reproducible y se

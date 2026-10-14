@@ -31,7 +31,7 @@ from .prompts import (
     SYNTH_USER,
 )
 from .retriever import retrieve as default_retrieve
-from .schema_context import build_schema_context
+from .schema_context import build_schema_context, data_period
 from .sql_guard import validate_sql
 
 HISTORY_TURNS = 4
@@ -153,6 +153,7 @@ def build_graph(
     *,
     run_sql: Callable[[str], QueryResult] = run_readonly,
     schema_text: Callable[[], str] = build_schema_context,
+    period_text: Callable[[], str] = data_period,
     retrieve_fn: Callable[..., list[dict]] = default_retrieve,
     checkpointer: Any = None,
 ):
@@ -287,7 +288,12 @@ def build_graph(
                 db_evidence = "La consulta a la base de datos fallo y no se pudo obtener el dato."
             else:
                 # La consulta va como contexto: sin ella la sintesis no sabe que filtros ya cumplen las filas.
+                try:
+                    period = period_text()
+                except Exception:  # noqa: BLE001  sin el periodo la respuesta igual se puede armar
+                    period = ""
                 payload = {
+                    "periodo_con_datos": period,
                     "consulta": state.get("sql"),
                     "columnas": state.get("columns", []),
                     "filas": (state.get("rows") or [])[:MAX_EVIDENCE_ROWS],

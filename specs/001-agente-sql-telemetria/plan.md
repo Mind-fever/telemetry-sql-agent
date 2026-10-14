@@ -35,7 +35,7 @@ automáticas; la evaluación con el modelo real se ejecuta aparte
 **Constraints**: capa gratuita del modelo (pocas llamadas por pregunta, reintentos con espera);
 solo lectura sobre la base; datos y documentos ficticios; sin secretos en el repositorio
 
-**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, 39 casos de
+**Scale/Scope**: 7 tablas de negocio (unas 39.400 filas en total, de las cuales 38.880 son lecturas), 3 PDF, 42 casos de
 evaluación (el plan original estimaba unos 25), un usuario por vez
 
 ## Constitution Check

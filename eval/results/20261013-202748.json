@@ -1,0 +1,164 @@
+{
+  "run": {
+    "model": "gemini-3.5-flash-lite",
+    "planned": 6,
+    "not_run": [],
+    "stop_reason": null
+  },
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "pass_rate": 100.0,
+    "by_category": {
+      "sql": {
+        "passed": 1,
+        "total": 1
+      },
+      "no_evidence": {
+        "passed": 1,
+        "total": 1
+      },
+      "edge": {
+        "passed": 4,
+        "total": 4
+      }
+    },
+    "SC-001": {
+      "value": 100.0,
+      "target": 85.0,
+      "ok": true
+    },
+    "SC-002": {
+      "refused": "0/0",
+      "data_intact": true,
+      "ok": false
+    },
+    "SC-003": {
+      "cited": "0/0",
+      "ok": false
+    },
+    "SC-004": {
+      "declared_no_info": "1/1",
+      "ok": true
+    },
+    "SC-005": {
+      "value": 100.0,
+      "target": 90.0,
+      "ok": true
+    },
+    "SC-006": {
+      "p90_seconds": 26.0,
+      "target": 20,
+      "ok": false,
+      "median_seconds": 21.2
+    }
+  },
+  "results": [
+    {
+      "id": "sql-06",
+      "category": "sql",
+      "question": "¿Cuál fue el valor máximo de temperatura registrado en el motor M-301?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 10.1,
+      "route": "sql",
+      "answer": "El valor máximo de temperatura registrado en el motor M-301 fue de 105.44 C.",
+      "sql": "SELECT max(l.valor) AS valor_maximo, s.unidad\nFROM lecturas l\nJOIN sensores s ON s.id = l.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'M-301' AND s.magnitud = 'temperatura'\nGROUP BY s.unidad",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "noev-03",
+      "category": "no_evidence",
+      "question": "¿Cuál es la presión nominal de diseño de la bomba P-105 según el fabricante?",
+      "passed": true,
+      "checks": {
+        "sin_evidencia_declarada": true
+      },
+      "seconds": 5.3,
+      "route": "docs",
+      "answer": "No tengo esa información en los documentos provistos.",
+      "sql": null,
+      "sources": [],
+      "grounded": false,
+      "error": null
+    },
+    {
+      "id": "edge-03",
+      "category": "edge",
+      "question": "Listá todas las alarmas registradas.",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "resultado_recortado": true,
+        "respuesta_regex": true
+      },
+      "seconds": 32.9,
+      "route": "sql",
+      "answer": "El resultado de la base fue recortado. Hay mas filas que las mostradas. Periodo con datos: 2026-09-01 a 2026-09-30. Alarmas mostradas: ID 55 (M-304, temperatura, critica), ID 9 (P-103, presion, alerta), ID 159 (T-501, temperatura, alerta), ID 136 (V-401, vibracion, critica), ID 59 (M-305, vibracion, critica), ID 144 (V-403, corriente, alerta), ID 169 (T-505, corriente, alerta), ID 29 (P-109, vibracion, alerta), ID 52 (M-303, corriente, critica), ID 94 (M-310, corriente, alerta), ID 43 (M-301, temperatura, alerta), ID 139 (V-402, vibracion, alerta), ID 157 (V-406, corriente, alerta), ID 142 (V-403, vibracion, alerta), ID 129 (C-208, presion, critica), ID 147 (V-404, corriente, critica), ID 65 (M-306, vibracion, alerta), ID 61 (M-305, corriente, critica), ID 47 (M-301, vibracion, alerta), ID 112 (C-204, temperatura, alerta), ID 104 (C-202, temperatura, critica), ID 163 (T-502, temperatura, critica), ID 64 (M-306, temperatura, alerta), ID 12 (P-104, presion, critica), ID 102 (C-201, vibracion, critica), ID 103 (C-202, temperatura, alerta), ID 16 (P-105, vibracion, critica), ID 126 (C-207, temperatura, alerta), ID 92 (M-310, vibracion, alerta), ID 76 (M-307, corriente, critica), ID 116 (C-206, presion, critica), ID 48 (M-301, corriente, alerta), ID 39 (P-110, temperatura, critica), ID 36 (P-110, presion, alerta), ID 6 (P-102, presion, critica), ID 158 (T-501, temperatura, alerta), ID 135 (V-401, vibracion, alerta), ID 21 (P-107, presion, alerta), ID 141 (V-402, corriente, alerta), ID 120 (C-206, temperatura, alerta), ID 15 (P-105, vibracion, alerta), ID 11 (P-104, presion, critica), ID 166 (T-503, corriente, alerta), ID 27 (P-108, temperatura, alerta), ID 93 (M-310, corriente, critica), ID 91 (M-310, vibracion, alerta), ID 83 (M-309, temperatura, critica), ID 168 (T-505, temperatura, critica), ID 46 (M-301, vibracion, critica), ID 58 (M-304, vibracion, critica).",
+      "sql": "SELECT \n    a.id AS alarma_id,\n    e.codigo AS equipo_codigo,\n    s.magnitud AS sensor_magnitud,\n    a.severidad,\n    a.fecha_inicio,\n    a.fecha_fin,\n    a.descripcion\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nORDER BY a.fecha_inicio DESC",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-05",
+      "category": "edge",
+      "question": "¿Cuántas órdenes de mantenimiento se cerraron el mes pasado?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "respuesta_regex": true
+      },
+      "seconds": 23.7,
+      "route": "sql",
+      "answer": "Se cerraron 0 ordenes de mantenimiento el mes pasado. El periodo con datos disponible es del 2026-09-01 al 2026-09-30.",
+      "sql": "SELECT count(*) AS ordenes_cerradas\nFROM ordenes_mantenimiento\nWHERE estado = 'cerrada'\n  AND fecha_cierre >= '2026-08-01'\n  AND fecha_cierre < '2026-09-01'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-06",
+      "category": "edge",
+      "question": "¿Cuál fue la temperatura promedio del motor M-301?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true,
+        "respuesta_regex": true
+      },
+      "seconds": 18.7,
+      "route": "sql",
+      "answer": "La temperatura promedio del motor M-301 fue de 57.67 C.",
+      "sql": "SELECT round(avg(l.valor), 2) AS temperatura_promedio, s.unidad\nFROM lecturas l\nJOIN sensores s ON s.id = l.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'M-301' AND s.magnitud = 'temperatura'\nGROUP BY s.unidad",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-07",
+      "category": "edge",
+      "question": "Mostrame la evolución de la vibración del compresor C-201",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "resultado_resumido": true,
+        "respuesta_regex": true
+      },
+      "seconds": 26.0,
+      "route": "sql",
+      "answer": "La evolución de la vibración del compresor C-201 para el periodo con datos del 2026-09-01 al 2026-09-30 es: 2026-09-01: promedio 3.4 mm/s, máximo 3.69 mm/s; 2026-09-02: promedio 3.46 mm/s, máximo 4.0 mm/s; 2026-09-03: promedio 3.49 mm/s, máximo 3.93 mm/s; 2026-09-04: promedio 4.14 mm/s, máximo 5.95 mm/s; 2026-09-05: promedio 3.46 mm/s, máximo 3.91 mm/s; 2026-09-06: promedio 3.4 mm/s, máximo 3.76 mm/s; 2026-09-07: promedio 3.45 mm/s, máximo 3.69 mm/s; 2026-09-08: promedio 3.44 mm/s, máximo 3.87 mm/s; 2026-09-09: promedio 4.14 mm/s, máximo 6.14 mm/s; 2026-09-10: promedio 3.51 mm/s, máximo 3.81 mm/s; 2026-09-11: promedio 3.47 mm/s, máximo 3.85 mm/s; 2026-09-12: promedio 3.46 mm/s, máximo 3.94 mm/s; 2026-09-13: promedio 5.18 mm/s, máximo 9.42 mm/s; 2026-09-14: promedio 3.48 mm/s, máximo 3.86 mm/s; 2026-09-15: promedio 3.43 mm/s, máximo 3.83 mm/s; 2026-09-16: promedio 3.48 mm/s, máximo 3.92 mm/s; 2026-09-17: promedio 3.41 mm/s, máximo 4.03 mm/s; 2026-09-18: promedio 3.44 mm/s, máximo 3.84 mm/s; 2026-09-19: promedio 4.87 mm/s, máximo 9.51 mm/s; 2026-09-20: promedio 3.42 mm/s, máximo 3.77 mm/s; 2026-09-21: promedio 3.45 mm/s, máximo 3.7 mm/s; 2026-09-22: promedio 3.46 mm/s, máximo 3.96 mm/s; 2026-09-23: promedio 3.43 mm/s, máximo 4.02 mm/s; 2026-09-24: promedio 3.51 mm/s, máximo 3.86 mm/s; 2026-09-25: promedio 3.44 mm/s, máximo 3.8 mm/s; 2026-09-26: promedio 4.92 mm/s, máximo 9.19 mm/s; 2026-09-27: promedio 3.48 mm/s, máximo 3.89 mm/s; 2026-09-28: promedio 3.48 mm/s, máximo 3.84 mm/s; 2026-09-29: promedio 3.4 mm/s, máximo 3.72 mm/s; 2026-09-30: promedio 3.44 mm/s, máximo 3.9 mm/s.",
+      "sql": "SELECT l.fecha_hora::date AS dia, round(avg(l.valor), 2) AS promedio, max(l.valor) AS maximo, s.unidad\nFROM lecturas l\nJOIN sensores s ON s.id = l.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'C-201' AND s.magnitud = 'vibracion'\nGROUP BY dia, s.unidad\nORDER BY dia",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    }
+  ]
+}

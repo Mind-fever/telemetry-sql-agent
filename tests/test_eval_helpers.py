@@ -89,6 +89,16 @@ def test_truncated_case_requires_the_system_flag_and_the_warning_in_the_answer()
     assert not ev.evaluate_case(case, not_cut, None)["resultado_recortado"]
 
 
+def test_summary_case_requires_few_rows_and_no_truncation():
+    case = {"id": "s", "category": "edge", "expect_route": "sql", "expect_max_rows": 31}
+    by_day = resp(rows=[{"dia": d, "promedio": 3.1} for d in range(30)])
+    raw = resp(rows=[{"valor": 3.1}] * 50, rows_truncated=True)
+    empty = resp(rows=[])
+    assert all(ev.evaluate_case(case, by_day, None).values())
+    assert not ev.evaluate_case(case, raw, None)["resultado_resumido"]
+    assert not ev.evaluate_case(case, empty, None)["resultado_resumido"]
+
+
 def test_off_topic_case_fails_if_the_agent_answers_from_its_own_knowledge():
     case = {"id": "o", "category": "edge", "expect_route": "none",
             "answer_regex": "(?i)planta|mantenimiento", "answer_excludes": ["Cervantes"]}

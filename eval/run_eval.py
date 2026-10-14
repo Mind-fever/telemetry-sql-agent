@@ -135,6 +135,9 @@ def evaluate_case(case: dict, resp, ref_values: list[Any] | None) -> dict[str, b
         checks["filas_correctas"] = rows_contain_values(resp.rows, ref_values)
         if case.get("category") not in ("both",):
             checks["respuesta_menciona_valor"] = answer_has_values(answer, ref_values)
+    if "expect_max_rows" in case:  # un resumen (por ejemplo por dia) entra completo, sin recorte
+        rows = resp.rows or []
+        checks["resultado_resumido"] = 0 < len(rows) <= case["expect_max_rows"] and not resp.rows_truncated
     if case.get("expect_truncated"):
         checks["resultado_recortado"] = bool(resp.rows_truncated) and resp.rows is not None
     if "expect_source" in case:

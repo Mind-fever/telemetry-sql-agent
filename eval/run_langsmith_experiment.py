@@ -37,7 +37,7 @@ from telemetry_agent.models import AgentResponse  # noqa: E402
 
 DATASET = "agente-sql-telemetria-golden"
 # Claves del caso que describen lo esperado; van a "outputs" del ejemplo en LangSmith.
-EXPECTED_KEYS = ("expect_route", "expect_refused", "expect_grounded", "expect_source", "expect_truncated",
+EXPECTED_KEYS = ("expect_route", "expect_refused", "expect_grounded", "expect_source", "expect_truncated", "expect_max_rows",
                  "answer_contains", "answer_regex", "answer_excludes", "reference_sql")
 
 

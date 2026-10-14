@@ -68,6 +68,13 @@ def test_synthesis_receives_the_executed_query_so_it_knows_the_filters():
     assert '"filas"' in evidence
 
 
+def test_synthesis_receives_the_period_covered_by_the_data():
+    agent, llm = make_agent([sql_route(), "select count(*) as n from ordenes_mantenimiento", synth()])
+    agent.ask("¿cuántas órdenes se cerraron el mes pasado?")
+    evidence = llm.calls[2]["user"]
+    assert '"periodo_con_datos": "2026-09-01 a 2026-09-30"' in evidence
+
+
 def test_the_schema_given_to_the_model_comes_from_the_database():
     agent, llm = make_agent([sql_route(), "select 1 as x from areas limit 1", synth()])
     agent.ask("probar")

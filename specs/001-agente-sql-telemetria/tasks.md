@@ -233,3 +233,19 @@ LangSmith y Streamlit). No pidió cambiar ninguna, así que no generó tareas de
 3. Sumar US2 y US3.
 4. Sumar la interfaz y la evaluación.
 5. Cerrar con README, informe y verificación.
+
+## Phase 13: Convergence
+
+- [X] T080 CRITICAL Agregar un caso de evaluación por cada comportamiento nuevo (período sin datos, unidad de medida, evolución por día) en `eval/golden.jsonl`, sin modificar los casos existentes per Constitution V (missing)
+- [X] T081 Aclarar en la respuesta qué período cubren los datos cuando la pregunta se refiere a un período sin datos, en `src/telemetry_agent/prompts.py` per FR-017 (missing)
+- [X] T082 Incluir la unidad de medida cuando la respuesta es un valor medido por un sensor, en `src/telemetry_agent/prompts.py` per FR-018 (missing)
+- [X] T083 Responder los pedidos de evolución de una magnitud con un resumen por día (promedio y máximo) en lugar de las lecturas individuales, en `src/telemetry_agent/prompts.py` per FR-019 (missing)
+- [X] T084 Actualizar el informe, el README y la guía con los requisitos nuevos y con el resultado de la evaluación después de los cambios per SC-008 (partial)
+- [X] T085 Revisar si `.claude/launch.json` debe quedar en el repositorio: es una configuración de desarrollo que ningún artefacto pide per plan: Project Structure (unrequested)
+
+Resultado de la fase 13 (2026-10-13). Evaluación con 42 casos: 42 de 42 en dos corridas seguidas
+(`eval/results/20261013-204127.json` y `20261013-205335.json`). En la primera el servicio del modelo
+respondió lento durante unos minutos y el percentil 90 de tiempo fue de 17,6 s; en la segunda fue de
+4,8 s. El experimento de LangSmith `gemini-3.5-flash-lite-e1bd90ed` dio 41 de 42: en `both-02` la
+respuesta fue correcta, pero la consulta devolvió una fila por alarma en vez del conteo. Pruebas
+automáticas: 100. `.claude/launch.json` se quitó del repositorio (T085).
