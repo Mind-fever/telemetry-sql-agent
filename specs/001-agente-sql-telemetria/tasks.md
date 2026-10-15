@@ -185,14 +185,16 @@ Surgieron al revisar cada criterio del enunciado contra el repositorio y la base
 
 ---
 
-## Phase 12: Revisión del proceso SDD con el autor (2026-10-12)
+## Phase 12: Revisión del proceso SDD (2026-10-12)
 
-Al revisar cómo se había usado Spec Kit se encontró lo siguiente. Spec Kit se instaló con su
-instalador oficial y los artefactos de las fases 1 a 8 se escribieron siguiendo sus plantillas y
-las instrucciones de cada comando, pero de corrido: sin ejecutar los comandos, sin la etapa de
-aclaración (`clarify`), sin el análisis de consistencia (`analyze`) y sin que el autor revisara
-cada etapa antes de pasar a la siguiente. Esta fase hace esa revisión, con los comandos reales y
-con las decisiones del autor.
+El autor revisó cómo se había aplicado Spec Kit en la etapa inicial. Spec Kit se instaló con su
+instalador oficial, pero los artefactos de las fases 1 a 8 se generaron de corrido siguiendo sus
+plantillas, sin ejecutar los comandos y sin revisar cada etapa antes de pasar a la siguiente.
+Tampoco se habían hecho la etapa de aclaración (`clarify`) ni el análisis de consistencia (`analyze`).
+
+En esta fase el autor completó esas etapas con los comandos reales de Spec Kit: revisó la
+constitución, respondió las preguntas de aclaración y decidió qué hallazgos del análisis corregir.
+Desde entonces, cada cambio de comportamiento empieza por la especificación (fases 13 a 15).
 
 - [X] T069 Revisar la constitución con el autor. Decisión: enmendar el principio V para que un comportamiento que no se puede provocar a propósito con el modelo real quede cubierto por una prueba automática (versión 1.2.0)
 - [X] T070 Aclarar en `research.md` cómo se verificaron las fuentes de la etapa de plan
