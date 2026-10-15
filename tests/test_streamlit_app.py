@@ -64,6 +64,27 @@ def test_example_button_asks_the_question():
     assert stub.questions and "P-101" in stub.questions[0][0]
 
 
+def test_missing_setting_names_the_variable_without_showing_values(monkeypatch):
+    """Caso borde de la 002: en la nube falta una clave. La app dice cuál y no muestra conexiones."""
+    import streamlit as st
+
+    import telemetry_agent.graph as graph
+
+    def failing_agent():
+        raise RuntimeError("Falta DATABASE_URL_RO en el entorno (ver .env.example).")
+
+    monkeypatch.setattr(graph, "Agent", failing_agent)
+    st.cache_resource.clear()
+    at = AppTest.from_file(APP, default_timeout=30)
+    at.run()
+    assert not at.exception
+    errors = " ".join(e.value for e in at.error)
+    assert "No se pudo iniciar el agente" in errors
+    assert "DATABASE_URL_RO" in errors
+    assert "postgresql://" not in errors
+    assert len(at.chat_input) == 0
+
+
 def test_conversation_keeps_the_same_thread_and_new_conversation_resets_it():
     at, stub = run_with_stub()
     at.chat_input[0].set_value("primera").run()

@@ -43,18 +43,18 @@ Neon y de las 104 pruebas existentes. Hay dos excepciones:
 
 **Purpose**: dejar el repositorio y `.env` listos para trabajar contra Neon.
 
-- [ ] T001 Hacer un commit en la rama `002-despliegue-nube` con los artefactos de Spec Kit:
+- [X] T001 Hacer un commit en la rama `002-despliegue-nube` con los artefactos de Spec Kit:
   `specs/002-despliegue-nube/`, que son `spec.md`, `plan.md`, `research.md`, `data-model.md`,
   `quickstart.md`, `contracts/`, `checklists/` y este `tasks.md`. Mensaje en castellano.
   - No incluir los cambios de permisos de `.specify/scripts/bash/*.sh` ni `docs/plan-despliegue-nube.md`,
     que no es parte de la entrega.
-- [ ] T002 [P] En `.env.example`, agregar al final un bloque comentado "Despliegue en la nube (opcional,
+- [X] T002 [P] En `.env.example`, agregar al final un bloque comentado "Despliegue en la nube (opcional,
   ver README)" con `NUBE_DATABASE_URL=` y `NUBE_DATABASE_URL_RO=`, sin valores. Dos comentarios de una
   línea:
   - La primera es la cadena pooled de Neon del dueño del proyecto y se usa solo para cargar la base desde
     la máquina del autor.
   - La segunda es la de `agent_ro` y es la única que se carga en Streamlit.
-- [ ] T003 Generar la clave de `agent_ro` en Neon y agregar `NUBE_DATABASE_URL_RO` al final de `.env`
+- [X] T003 Generar la clave de `agent_ro` en Neon y agregar `NUBE_DATABASE_URL_RO` al final de `.env`
   (R3). Hacerlo con un script de Python que corre en el momento y no queda en el repo:
   1. Leer `NUBE_DATABASE_URL` con `dotenv_values`.
   2. Generar la clave con `secrets.token_urlsafe(24)`.
@@ -72,13 +72,13 @@ Neon y de las 104 pruebas existentes. Hay dos excepciones:
 
 **Purpose**: dejar en Neon una copia exacta de la base local. Bloquea a las tres historias.
 
-- [ ] T004 Crear el esquema, la extensión `vector` y el rol `agent_ro` en Neon. Correr
+- [X] T004 Crear el esquema, la extensión `vector` y el rol `agent_ro` en Neon. Correr
   `scripts/setup_db.py` con `DATABASE_URL` = conexión directa de Neon y `DATABASE_URL_RO` =
   `NUBE_DATABASE_URL_RO`, definidas solo para ese proceso. Para no mostrar los valores, usar un script de
   Python que corre en el momento: arma el entorno y llama a `setup_db.py` con `subprocess`.
   - Se espera "Esquema creado." y "Rol agent_ro listo con permisos de solo lectura."
   - Si Neon rechaza la clave por entropía, volver a T003 con `token_urlsafe(32)`.
-- [ ] T005 Cargar `db/dump/telemetria_datos.sql` en Neon con el `psql` 16.15 del contenedor de Docker (R4).
+- [X] T005 Cargar `db/dump/telemetria_datos.sql` en Neon con el `psql` 16.15 del contenedor de Docker (R4).
   1. Comprobar que el contenedor esté levantado (`docker compose up -d db`).
   2. Copiar el volcado con `docker compose cp db/dump/telemetria_datos.sql db:/tmp/telemetria_datos.sql`.
   3. Correr `docker compose exec -T -e PGURL db sh -c 'psql "$PGURL" -v ON_ERROR_STOP=1 -f /tmp/telemetria_datos.sql'`,
@@ -91,11 +91,11 @@ Neon y de las 104 pruebas existentes. Hay dos excepciones:
   con `PGURL` definida en el entorno del proceso. Si dice "vacía", lanzar `docker` desde un script de
   Python con `subprocess`, pasando `-e PGURL=<valor>` en la lista de argumentos. El valor no se imprime y
   la lista de argumentos tampoco.
-- [ ] T006 Contar las filas de las 8 tablas en Neon (conexión directa) y en Docker (`DATABASE_URL`), y
+- [X] T006 Contar las filas de las 8 tablas en Neon (conexión directa) y en Docker (`DATABASE_URL`), y
   comparar (SC-002). Se espera, en las dos bases: areas 18, tecnicos 20, equipos 40, sensores 108,
   lecturas 38.880, alarmas 171, ordenes_mantenimiento 153 y doc_chunks 18. Anotar el resultado en la
   sección "Notas de ejecución" de este archivo.
-- [ ] T007 Comprobar en Neon que `agent_ro` no puede escribir: con `NUBE_DATABASE_URL_RO`, intentar
+- [X] T007 Comprobar en Neon que `agent_ro` no puede escribir: con `NUBE_DATABASE_URL_RO`, intentar
   `delete from alarmas` y esperar un error de permisos. Después, con la conexión directa, confirmar que
   siguen 171 alarmas. Anotarlo en "Notas de ejecución".
 
@@ -110,7 +110,7 @@ Neon y de las 104 pruebas existentes. Hay dos excepciones:
 **Independent Test**: desde otra computadora o desde el celular, abrir el enlace y hacer las 5 preguntas del
 escenario 3 de [quickstart.md](quickstart.md).
 
-- [ ] T008 [US1] Prueba de humo antes de publicar: correr
+- [X] T008 [US1] Prueba de humo antes de publicar: correr
   `python -m telemetry_agent.cli "¿Cuántas alarmas críticas tuvo la bomba P-101 en septiembre?"` con
   `DATABASE_URL_RO` = `NUBE_DATABASE_URL_RO`, solo para ese proceso. Se espera la misma respuesta que con
   la base local, con fuente "base de datos". Si falla, el problema está en la base o en la conexión, no en
@@ -167,7 +167,7 @@ escenario 3 de [quickstart.md](quickstart.md).
 **Independent Test**: los 8 casos contra Neon dan lo mismo, caso por caso, que en
 `eval/results/20261015-001031.json`, y hay trazas en `agente-sql-telemetria-nube`.
 
-- [ ] T015 [P] [US2] Crear `eval/nube.jsonl` con 8 líneas copiadas tal cual de `eval/golden.jsonl`: los casos
+- [X] T015 [P] [US2] Crear `eval/nube.jsonl` con 8 líneas copiadas tal cual de `eval/golden.jsonl`: los casos
   `sql-01`, `doc-01`, `both-01`, `refuse-01`, `noev-02`, `none-01`, `edge-03` y `follow-01`, en ese orden.
   Agregar a cada línea el campo
   `"origen": "Copia de eval/golden.jsonl del 2026-10-15: 8 de sus 43 casos, uno por categoría, para SC-003 de la funcionalidad 002. Fuera de este campo, el caso es idéntico al original."`.
@@ -177,7 +177,7 @@ escenario 3 de [quickstart.md](quickstart.md).
     `golden.jsonl`: tienen que ser iguales. Se puede hacer con un script de Python que corre en el momento.
   - Correr `python eval/run_eval.py --cases eval/nube.jsonl --check-refs` con la configuración local para
     ver que el archivo se lee.
-- [ ] T016 [US2] Correr `python eval/run_eval.py --cases eval/nube.jsonl --delay 5` con tres variables
+- [X] T016 [US2] Correr `python eval/run_eval.py --cases eval/nube.jsonl --delay 5` con tres variables
   definidas solo para ese proceso (R9):
   - `DATABASE_URL_RO` = `NUBE_DATABASE_URL_RO`.
   - `DATABASE_URL` = conexión directa de Neon. `run_eval.py` la usa para las consultas de referencia y para
@@ -190,7 +190,7 @@ escenario 3 de [quickstart.md](quickstart.md).
   - `eval/results/latest.md` no cambia.
 
   Unos 20 pedidos de la cuota local.
-- [ ] T017 [US2] Comparar caso por caso `eval/results/<fecha>-nube.json` con los mismos 8 ids de
+- [X] T017 [US2] Comparar caso por caso `eval/results/<fecha>-nube.json` con los mismos 8 ids de
   `eval/results/20261015-001031.json`: `passed` y ruta. Anotar la tabla en "Notas de ejecución" (SC-003).
   Si un caso difiere, volver a correr solo ese caso una vez y anotar los dos resultados. No ajustar
   prompts: esta funcionalidad no cambia el agente (FR-004). **Si después de repetirlo sigue difiriendo**,
@@ -214,7 +214,7 @@ escenario 3 de [quickstart.md](quickstart.md).
 **Independent Test**: con `.env` tal cual, sin variables extra, pasan las 104 pruebas y el agente responde
 con la base de Docker.
 
-- [ ] T020 [P] [US3] Agregar en `tests/test_streamlit_app.py` una prueba del caso borde "falta una clave"
+- [X] T020 [P] [US3] Agregar en `tests/test_streamlit_app.py` una prueba del caso borde "falta una clave"
   (hallazgo C4 del análisis). Hoy no hay ninguna.
   - Simular que `load_agent()` lanza `RuntimeError("Falta DATABASE_URL_RO en el entorno (ver .env.example).")`.
   - Comprobar que la app muestra un `st.error` que nombra `DATABASE_URL_RO`.
@@ -223,7 +223,7 @@ con la base de Docker.
   Después, correr `.venv/Scripts/python.exe -m pytest` sin variables extra en el entorno. Se esperan 105
   pruebas aprobadas: las 104 de antes de la 002 más esta, o 106 si se aplicó T013. Anotar el resultado
   en "Notas de ejecución" (SC-006).
-- [ ] T021 [US3] Con la configuración local, correr el CLI con una pregunta de datos y comprobar que
+- [X] T021 [US3] Con la configuración local, correr el CLI con una pregunta de datos y comprobar que
   responde con la base de Docker. Confirmar con el hash de T003 que `DATABASE_URL` y `DATABASE_URL_RO`
   de `.env` no cambiaron (FR-010).
 
@@ -343,3 +343,58 @@ T014 ✘ ─► T026
 
 (Se completa durante la implementación: conteos de T006 y T007, dirección de T010, tabla de T012, si se
 aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
+
+### 2026-10-15
+
+- **T003**: `NUBE_DATABASE_URL_RO` agregada a `.env`. El hash de las líneas `DATABASE_URL=` y
+  `DATABASE_URL_RO=` es el mismo antes y después (`09c01829dfd0`).
+- **T004**: `setup_db.py` contra Neon (conexión directa) terminó con "Esquema creado." y "Rol agent_ro
+  listo con permisos de solo lectura.". Neon aceptó la clave de `token_urlsafe(24)`.
+- **T005**: antes de cargar se comprobó que `PGURL` llega al contenedor (hallazgo B1): `docker compose
+  exec -e PGURL` toma el valor del entorno. El volcado se cargó con el `psql` del contenedor, sin errores,
+  y los 8 `setval` quedaron en el último id de cada tabla.
+- **T006 (SC-002 cumplido)**: Docker y Neon dan las mismas filas, tabla por tabla.
+
+  | Tabla | Docker | Neon |
+  |---|---|---|
+  | areas | 18 | 18 |
+  | tecnicos | 20 | 20 |
+  | equipos | 40 | 40 |
+  | sensores | 108 | 108 |
+  | lecturas | 38.880 | 38.880 |
+  | alarmas | 171 | 171 |
+  | ordenes_mantenimiento | 153 | 153 |
+  | doc_chunks | 18 | 18 |
+
+- **T007**: con `agent_ro`, `delete from alarmas` falló con `InsufficientPrivilege` ("permission denied
+  for table alarmas"). Después siguen 171 alarmas. `agent_ro` lee por el pooler (40 equipos), y pgvector
+  0.8.6 está instalado.
+- **T008**: la pregunta "¿Cuántas alarmas críticas tuvo la bomba P-101 en septiembre?" con el CLI contra
+  Neon respondió 1 alarma, igual que la consulta de referencia de `sql-01` en Docker.
+- **T015**: se creó `eval/nube.jsonl` con 8 casos, uno por categoría. Sin los campos `origen` y `nota`,
+  cada caso es idéntico a su original de `golden.jsonl`. `--check-refs` lee los 8 casos y no reporta
+  problemas en las referencias.
+- **T016**: los 8 casos contra Neon dieron 8 de 8 a las 16:16, con datos intactos (`DATABASE_URL` en Neon
+  solo para ese proceso). El resultado está en `eval/results/latest-nube.md` y
+  `eval/results/20261015-161644-nube.json`. `eval/results/latest.md` no cambió (mismo md5). Tiempos: la
+  mediana fue 6,2 s y el p90 10,0 s.
+- **T017 (SC-003 cumplido)**: los 8 casos coinciden con la corrida local `20261015-001031.json`.
+
+  | Caso | Local | Neon |
+  |---|---|---|
+  | sql-01 | aprobado, sql | aprobado, sql |
+  | doc-01 | aprobado, docs | aprobado, docs |
+  | both-01 | aprobado, both | aprobado, both |
+  | refuse-01 | aprobado, refuse | aprobado, refuse |
+  | noev-02 | aprobado, docs | aprobado, docs |
+  | none-01 | aprobado, none | aprobado, none |
+  | edge-03 | aprobado, sql | aprobado, sql |
+  | follow-01 | aprobado, sql | aprobado, sql |
+
+  No hubo diferencias, así que no hace falta la justificación del principio V.
+- **T020 (SC-006)**: se agregó a `tests/test_streamlit_app.py` la prueba
+  `test_missing_setting_names_the_variable_without_showing_values`. Con la configuración local pasan 105
+  pruebas: las 104 de antes más esta.
+- **T021**: el CLI con la configuración local respondió "¿Cuántas alarmas siguen abiertas?" con 3, desde
+  Docker. El hash de `DATABASE_URL` y `DATABASE_URL_RO` sigue siendo `09c01829dfd0` y las dos apuntan a
+  `localhost`.

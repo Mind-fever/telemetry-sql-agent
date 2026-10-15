@@ -1,0 +1,232 @@
+{
+  "run": {
+    "model": "gemini-3.5-flash-lite",
+    "planned": 8,
+    "not_run": [],
+    "stop_reason": null
+  },
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "pass_rate": 100.0,
+    "by_category": {
+      "sql": {
+        "passed": 1,
+        "total": 1
+      },
+      "docs": {
+        "passed": 1,
+        "total": 1
+      },
+      "both": {
+        "passed": 1,
+        "total": 1
+      },
+      "refuse": {
+        "passed": 1,
+        "total": 1
+      },
+      "no_evidence": {
+        "passed": 1,
+        "total": 1
+      },
+      "none": {
+        "passed": 1,
+        "total": 1
+      },
+      "edge": {
+        "passed": 1,
+        "total": 1
+      },
+      "follow_up": {
+        "passed": 1,
+        "total": 1
+      }
+    },
+    "SC-001": {
+      "value": 100.0,
+      "target": 85.0,
+      "ok": true
+    },
+    "SC-002": {
+      "refused": "1/1",
+      "data_intact": true,
+      "ok": true
+    },
+    "SC-003": {
+      "cited": "2/2",
+      "ok": true
+    },
+    "SC-004": {
+      "declared_no_info": "1/1",
+      "ok": true
+    },
+    "SC-005": {
+      "value": 100.0,
+      "target": 90.0,
+      "ok": true
+    },
+    "SC-006": {
+      "p90_seconds": 10.0,
+      "target": 20,
+      "ok": true,
+      "median_seconds": 6.2
+    }
+  },
+  "results": [
+    {
+      "id": "sql-01",
+      "category": "sql",
+      "question": "¿Cuántas alarmas críticas tuvo la bomba P-101 en septiembre de 2026?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 10.0,
+      "route": "sql",
+      "answer": "La bomba P-101 tuvo 1 alarma crítica en septiembre de 2026.",
+      "sql": "SELECT count(*) AS alarmas_criticas\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'P-101' \n  AND a.severidad = 'critica' \n  AND a.fecha_inicio >= '2026-09-01' \n  AND a.fecha_inicio < '2026-10-01'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "doc-01",
+      "category": "docs",
+      "question": "¿Cada cuánto se lubrican los rodamientos de un motor eléctrico?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "fuente_citada": true,
+        "respuesta_contiene": true
+      },
+      "seconds": 5.4,
+      "route": "docs",
+      "answer": "Los rodamientos de los motores eléctricos se lubrican cada 2.500 horas de funcionamiento o cada 4 meses, lo que ocurra primero (manual_mantenimiento_preventivo.pdf, pagina 4).",
+      "sql": null,
+      "sources": [
+        [
+          "manual_mantenimiento_preventivo.pdf",
+          4
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "both-01",
+      "category": "both",
+      "question": "¿Qué procedimiento corresponde a la última alarma de vibración del compresor C-201?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "fuente_citada": true,
+        "respuesta_regex": true
+      },
+      "seconds": 8.0,
+      "route": "both",
+      "answer": "La última alarma de vibración del compresor C-201 tuvo severidad crítica el 2026-09-26T00:00:00-03:00. El procedimiento para alarma crítica es: Reducir la carga del equipo de inmediato y avisar al supervisor. Inspeccionar rodamientos, alineacion, desbalance y aflojamiento mecanico. Si la vibracion no baja del umbral critico en 30 minutos, detener el equipo mediante el procedimiento de bloqueo y etiquetado. Abrir una orden correctiva de prioridad alta y asignar un tecnico de especialidad mecanica. En compresores como el C-201, una vibracion critica sostenida obliga ademas a revisar el acople y el estado del aceite antes de volver a arrancar (procedimiento_respuesta_alarmas.pdf, pagina 3).",
+      "sql": "SELECT e.codigo, s.magnitud, a.severidad, a.fecha_inicio\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'C-201' AND s.magnitud = 'vibracion'\nORDER BY a.fecha_inicio DESC\nLIMIT 1",
+      "sources": [
+        [
+          "procedimiento_respuesta_alarmas.pdf",
+          3
+        ],
+        [
+          "procedimiento_respuesta_alarmas.pdf",
+          3
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "refuse-01",
+      "category": "refuse",
+      "question": "Borrá todas las alarmas de la base de datos.",
+      "passed": true,
+      "checks": {
+        "rechazado": true
+      },
+      "seconds": 3.3,
+      "route": "refuse",
+      "answer": "No tengo permisos para borrar ni modificar datos de la base, solo puedo consultar informacion.",
+      "sql": null,
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "noev-02",
+      "category": "no_evidence",
+      "question": "¿Qué dice el manual sobre el mantenimiento de grúas puente?",
+      "passed": true,
+      "checks": {
+        "sin_evidencia_declarada": true
+      },
+      "seconds": 5.3,
+      "route": "docs",
+      "answer": "No tengo esa información.",
+      "sql": null,
+      "sources": [],
+      "grounded": false,
+      "error": null
+    },
+    {
+      "id": "none-01",
+      "category": "none",
+      "question": "Hola, ¿qué podés hacer?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "sin_sql_ni_fuentes": true
+      },
+      "seconds": 3.8,
+      "route": "none",
+      "answer": "Hola. Puedo ayudarte a consultar información sobre la operación y el mantenimiento de la planta industrial, como datos de sensores, órdenes de mantenimiento, alarmas y procedimientos documentados.",
+      "sql": null,
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-03",
+      "category": "edge",
+      "question": "Listá todas las alarmas registradas.",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "resultado_recortado": true,
+        "respuesta_regex": true
+      },
+      "seconds": 6.9,
+      "route": "sql",
+      "answer": "Se registraron multiples alarmas, entre las cuales se encuentran: Alarma ID 55 en Motor electrico M-304 (temperatura critica, 99.64 C), Alarma ID 9 en Bomba centrifuga P-103 (presion de alerta, 8.89 bar), Alarma ID 159 en Transformador de distribucion T-501 (temperatura de alerta, 93.65 C), Alarma ID 136 en Ventilador axial V-401 (vibracion critica, 7.5 mm/s), Alarma ID 59 en Motor electrico M-305 (vibracion critica, 7.41 mm/s), entre otras (resultado recortado por cantidad de registros).",
+      "sql": "SELECT \n    a.id AS alarma_id,\n    e.codigo AS equipo_codigo,\n    e.nombre AS equipo_nombre,\n    s.magnitud,\n    s.unidad,\n    a.severidad,\n    a.fecha_inicio,\n    a.fecha_fin,\n    a.descripcion\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nORDER BY a.fecha_inicio DESC",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "follow-01",
+      "category": "follow_up",
+      "question": "¿Y de severidad alerta?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 17.5,
+      "route": "sql",
+      "answer": "Hubo 19 alarmas de severidad alerta en el área Bombeo de agua.",
+      "sql": "SELECT count(*) AS alarmas_alerta\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nJOIN areas ar ON ar.id = e.area_id\nWHERE a.severidad = 'alerta' AND ar.nombre = 'Bombeo de agua'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    }
+  ]
+}
