@@ -153,6 +153,8 @@ def test_service_outage_is_not_a_quota_error_but_also_stops_the_run():
     assert ev.stop_scope("504 DEADLINE_EXCEEDED. Deadline expired") == "service"
     assert ev.stop_scope(DAY) == "day" and ev.stop_scope(MINUTE) == "minute"
     assert ev.stop_scope(None) is None and ev.stop_scope("syntax error at or near") is None
+    assert ev.stop_scope("[WinError 10054] Se ha forzado la interrupcion de una conexion existente") == "service"
+    assert ev.stop_scope("[Errno 11001] getaddrinfo failed") == "service"
 
 
 def test_service_outage_waits_and_retries_once_then_stops():

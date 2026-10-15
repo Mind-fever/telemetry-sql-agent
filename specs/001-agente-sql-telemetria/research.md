@@ -29,8 +29,9 @@ reales están marcados como "Actualización" con su fecha, y esos sí salen de u
   error 429 que devuelve la API. `gemini-3.5-flash`: 5 pedidos por minuto y 20 por día. La
   evaluación completa necesita unas 90 llamadas, así que con ese modelo no se puede correr en un
   día. Se cambió el valor por defecto a `gemini-3.5-flash-lite`: 15 pedidos por minuto, y en dos
-  corridas completas seguidas (unas 100 llamadas cada una) no apareció un límite diario. No se
-  conoce el valor exacto de su límite diario.
+  corridas completas seguidas (unas 100 llamadas cada una) no apareció un límite diario. Su límite
+  diario es de 500 pedidos: se leyó del error 429 del 2026-10-13, cuando se agotó tras varias
+  corridas completas el mismo día.
 - **Fuente**: https://ai.google.dev/gemini-api/docs/pricing y
   https://ai.google.dev/gemini-api/docs/rate-limits
 

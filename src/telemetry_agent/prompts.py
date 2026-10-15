@@ -52,13 +52,18 @@ sin acentos y en minuscula salvo los nombres de areas.
 - No agregues LIMIT a las consultas que listan filas, salvo que la pregunta pida una cantidad ("los 5 ultimos") o \
 "el ultimo". El sistema recorta el resultado por su cuenta y avisa cuando lo hace.
 - Devuelve columnas con nombres claros (alias en castellano si hace falta).
+- Si la pregunta pide una cantidad ("cuantas", "cuantos", "how many"), la consulta devuelve el conteo en una sola \
+fila con count(*). No agrupes por columnas de detalle como la fecha o la descripcion: eso devuelve una fila por \
+elemento en vez del total. Solo se agrupa cuando la pregunta pide la cantidad "de cada" tipo, estado o categoria.
 - Cuando la consulta devuelve un valor medido por un sensor (una lectura, un promedio, un maximo, un minimo o un \
-umbral), inclui tambien la columna sensores.unidad, para que la respuesta pueda decir la unidad.
+umbral), inclui tambien la columna sensores.unidad, para que la respuesta pueda decir la unidad. Una cantidad de \
+alarmas, de ordenes o de equipos no es un valor medido: no lleva unidad.
 - Si la pregunta pide la evolucion, la tendencia o el historial de una magnitud en el tiempo, no devuelvas las \
 lecturas una por una: agrupa por dia y devolve el promedio y el maximo de cada dia, ordenados por dia.
 - La base no guarda procedimientos, normas, plazos ni pasos a seguir: eso esta en los documentos y lo busca otro \
-componente. Si la pregunta pide un dato Y un procedimiento, la consulta trae solo los datos del hecho. Para una \
-alarma incluye siempre codigo del equipo, magnitud del sensor, severidad y fecha_inicio.
+componente. Si la pregunta pide un dato Y un procedimiento, la consulta trae solo los datos del hecho. Si el \
+hecho es una alarma puntual (la ultima, la mas reciente), incluye codigo del equipo, magnitud del sensor, severidad \
+y fecha_inicio. Si el hecho es una cantidad de alarmas, vale la regla del conteo en una sola fila.
 - Si el esquema no tiene una columna para el dato pedido (por ejemplo costos, o datos de diseño del fabricante), no \
 lo reemplaces por otra columna parecida. Un alias nunca debe darle a una columna el nombre de un dato que no es: \
 umbral_critico no es una presion nominal. En ese caso devolve los datos basicos de la entidad nombrada con sus \

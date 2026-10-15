@@ -160,12 +160,14 @@ def stop_scope(error: str | None) -> str | None:
     """Motivo por el que un caso no se pudo correr por causas ajenas al agente.
 
     "day" o "minute" si se alcanzo un limite de cuota, "service" si el servicio del modelo no
-    estaba disponible (errores 503 y 504), None si el caso corrio.
+    estaba disponible (errores 503 y 504, o la conexion se corto), None si el caso corrio.
     """
     scope = quota_scope(error)
     if scope:
         return scope
-    if error and any(k in error for k in ("503", "UNAVAILABLE", "504", "DEADLINE_EXCEEDED")):
+    if error and any(k in error for k in ("503", "UNAVAILABLE", "504", "DEADLINE_EXCEEDED", "10054",
+                                           "ConnectionReset", "Connection aborted", "RemoteProtocolError",
+                                           "getaddrinfo", "11001", "ConnectError")):
         return "service"
     return None
 

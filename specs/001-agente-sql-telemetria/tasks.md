@@ -252,7 +252,7 @@ automáticas: 100. `.claude/launch.json` se quitó del repositorio (T085).
 
 Tarea agregada por decisión del autor después de ver el resultado de la fase 13:
 
-- [ ] T086 Hacer que una pregunta que pide una cantidad ("cuántas") devuelva el conteo en una sola fila, y no una fila por cada elemento contado, en `src/telemetry_agent/prompts.py`. En el experimento de LangSmith el caso `both-02` respondió bien pero su consulta devolvió una fila por alarma. Si la evaluación empeora, el cambio se revierte
+- [X] T086 Hacer que una pregunta que pide una cantidad ("cuántas") devuelva el conteo en una sola fila, y no una fila por cada elemento contado, en `src/telemetry_agent/prompts.py`. En el experimento de LangSmith el caso `both-02` respondió bien pero su consulta devolvió una fila por alarma. Si la evaluación empeora, el cambio se revierte
 
 La corrida de verificación de T086 (2026-10-13, `eval/results/20261013-224949.json`) no sirvió para
 decidir. Los primeros 30 casos aprobaron, entre ellos `both-02` con el conteo en una sola fila. Después
@@ -260,5 +260,17 @@ el servicio del modelo devolvió errores 503 y 504, y más tarde se agotó la cu
 de 500 pedidos por día para `gemini-3.5-flash-lite`. T086 queda abierta hasta repetir la corrida.
 
 - [X] T087 Hacer que la evaluación trate la caída del servicio del modelo (errores 503 y 504) igual que el límite por minuto: esperar, reintentar el caso una vez y, si sigue, cortar la corrida sin contar los casos como fallados, en `eval/run_eval.py` y `eval/run_langsmith_experiment.py`, con su prueba. En la corrida del 2026-10-13, 7 casos figuraron como fallados por errores del servicio
-- [ ] T088 Aclarar en el prompt de SQL que un conteo no es un valor medido y no lleva unidad: en esa corrida la respuesta de `both-02` dijo "2 alarmas críticas de temperatura (C)", en `src/telemetry_agent/prompts.py`
-- [ ] T089 Repetir la evaluación y el experimento de LangSmith cuando se renueve la cuota, decidir si T086 y T088 se quedan o se revierten, y registrar en el informe y en `research.md` el límite diario de 500 pedidos
+- [X] T088 Aclarar en el prompt de SQL que un conteo no es un valor medido y no lleva unidad: en esa corrida la respuesta de `both-02` dijo "2 alarmas críticas de temperatura (C)", en `src/telemetry_agent/prompts.py`
+- [X] T089 Repetir la evaluación y el experimento de LangSmith cuando se renueve la cuota, decidir si T086 y T088 se quedan o se revierten, y registrar en el informe y en `research.md` el límite diario de 500 pedidos
+
+Corrida de verificación del 2026-10-14 (`eval/results/20261014-214000.json`): 41 de 42. El caso que falta,
+`refuse-03`, se cortó por un error de red ("se ha forzado la interrupción de una conexión existente por el
+host remoto"), no por una respuesta del agente. El experimento de LangSmith `gemini-3.5-flash-lite-41d86748`,
+corrido a continuación, dio 42 de 42, con `both-02` resuelto por el conteo en una sola fila.
+
+- [X] T090 Hacer que la evaluación reconozca también los cortes de conexión con el servicio del modelo como un error ajeno al agente, en `eval/run_eval.py`, con su prueba. Incluye la falta de conexión ("getaddrinfo failed"), que en la corrida del 2026-10-14 a las 22:34 hizo figurar como fallado a `refuse-02` mientras la notebook salía de la suspensión
+
+Resultado final (2026-10-14, `eval/results/20261014-224501.json`): 42 de 42, percentil 90 de tiempo de
+6,2 s. Los cambios de T086 y T088 se quedan. Entre las corridas afectadas por la red o el servicio
+(`20261013-224949.json`, `20261014-214000.json` y `20261014-223425.json`) ningún caso falló por una
+respuesta del agente. Pruebas automáticas: 102.

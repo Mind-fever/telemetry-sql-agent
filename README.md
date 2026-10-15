@@ -27,10 +27,9 @@ en la computadora de quien lo usa.
 
 ## Resultado de la evaluación
 
-Última corrida, 13 de octubre de 2026, con `gemini-3.5-flash-lite`: 42 de 42 casos aprobados con
-`eval/run_eval.py`, en dos corridas seguidas. El experimento de LangSmith del mismo día dio 41 de 42: en el
-caso que falló la respuesta fue correcta, pero la consulta devolvió una fila por alarma en vez del conteo.
-El detalle está en `eval/results/latest.md`. Las pruebas automáticas son 100 y pasan todas.
+Última corrida, 14 de octubre de 2026, con `gemini-3.5-flash-lite`: 42 de 42 casos aprobados con
+`eval/run_eval.py`, y 42 de 42 en el experimento de LangSmith. El detalle está en `eval/results/latest.md`.
+Las pruebas automáticas son 102 y pasan todas.
 
 El modelo no responde siempre igual, así que el resultado puede variar entre corridas. El historial de las
 corridas anteriores, con los errores que se encontraron y corrigieron, está en `eval/results/` y en el informe.
@@ -182,7 +181,7 @@ la base local de Docker.
 - **Errores 429 o `RESOURCE_EXHAUSTED`.** Se alcanzó el límite de la capa gratuita de Gemini. El mensaje del agente
   indica si es el límite por minuto o el diario. La evaluación espera y reintenta sola ante el límite por minuto, y
   se detiene ante el diario. Límites observados el 2026-10-10: `gemini-3.5-flash` 5 pedidos por minuto y 20 por día;
-  `gemini-3.5-flash-lite` 15 por minuto. Los límites vigentes se ven en https://ai.dev/rate-limit.
+  `gemini-3.5-flash-lite` 15 por minuto y 500 por día (una evaluación completa usa unas 110). Los límites vigentes se ven en https://ai.dev/rate-limit.
 - **Las preguntas sobre documentos responden "no tengo esa información".** Revisar que `ingest_docs.py` haya
   informado 18 fragmentos cargados. Si usó `--fake`, los embeddings son falsos y hay que volver a correrlo sin esa
   opción.
