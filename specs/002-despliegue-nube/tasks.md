@@ -252,7 +252,7 @@ con la base de Docker.
   3. En "Resultado de la evaluación", agregar una línea con el resultado de `eval/results/latest-nube.md`.
   4. En "Informe y evidencias", agregar las capturas 06 y 07 y `eval/results/latest-nube.md`.
 - [X] T023 [P] Actualizar `docs/informe/README.md` con las dos capturas nuevas y su fecha.
-- [ ] T024 Actualizar el informe `docs/informe/informe.docx`:
+- [X] T024 Actualizar el informe `docs/informe/informe.docx`:
   - Agregar la fila del criterio de despliegue con su evidencia: dirección, capturas 06 y 07, resultado
     de los 8 casos y conteo de filas.
   - Para no pasar de 10 páginas, reducir la tabla de corridas de evaluación de 13 filas a las 4 o 5 que
@@ -441,3 +441,15 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
   - La 07 muestra la traza de las 4:57 PM: ruta `both`, 9,71 s en total, con router, SQL, recuperación y
     síntesis.
   - Ninguna de las dos muestra claves.
+- **T024 (PDF)**: `docs/informe/informe.pdf` se exportó con Word (automatización COM, el documento se abrió
+  en modo de solo lectura). Word cuenta 10 páginas y pypdf también. El PDF incluye la fila del criterio de
+  despliegue, "se eligieron cinco", las 105 pruebas y la limitación nueva.
+- **T025**: se borró el archivo temporal de Secrets de T009. Se buscaron secretos en lo versionado y en lo
+  preparado para commit, con el resultado de abajo. El estado de `spec.md` pasó a "Implementada y
+  desplegada".
+  - Búsqueda de claves (`npg_`, `AIza`, `lsv2_`, `agent_ro:…@` y `neondb_owner:`) en lo preparado y en
+    toda la historia de la rama (`git log master..HEAD -p`): la única coincidencia es el propio patrón
+    escrito en esta lista.
+  - No hay hosts de Neon (`ep-….neon.tech`) en el repo.
+  - `git ls-files .env .streamlit/secrets.toml` no devuelve nada.
+  - Pendiente: fusionar en `master` y subir, con el OK del autor.

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-15
 
-**Status**: Draft
+**Status**: Implementada y desplegada (2026-10-15)
 
 **Input**: User description: "Desplegar el agente en la nube para cumplir el criterio de promoción de despliegue. La interfaz de chat tiene que quedar accesible por internet y la base de datos en un servicio externo, los dos gratuitos. El agente tiene que comportarse igual que la versión local, con las mismas protecciones de solo lectura y respondiendo las mismas preguntas. La van a usar solo el autor y el jurado del trabajo. La versión local con Docker tiene que seguir funcionando igual que ahora."
 
