@@ -197,11 +197,11 @@ escenario 3 de [quickstart.md](quickstart.md).
   escribir en "Notas de ejecución", antes de T025, la justificación que pide el principio V de la
   constitución: qué difiere, si la causa es la nube o la variación del modelo, y por qué igual se fusiona.
   Sin esa justificación, no se fusiona.
-- [ ] T018 [US2] (autor) En LangSmith, abrir el proyecto `agente-sql-telemetria-nube` y comprobar que estén
+- [X] T018 [US2] (autor) En LangSmith, abrir el proyecto `agente-sql-telemetria-nube` y comprobar que estén
   las ejecuciones de T012 (5) y T016 (8). Guardar una captura de la traza de la pregunta combinada de T012
   en `docs/informe/capturas/07-traza-nube.png`.
-- [ ] T019 [P] [US2] (autor) Guardar una captura de la app pública respondiendo la pregunta combinada de
-  T012, con la dirección visible, en `docs/informe/capturas/06-app-nube.jpg`.
+- [X] T019 [P] [US2] (autor) Guardar una captura de la app pública respondiendo la pregunta combinada de
+  T012, con la dirección visible, en `docs/informe/capturas/06-app-nube.png`.
 
 **Checkpoint**: la evidencia del criterio de despliegue está completa.
 
@@ -433,3 +433,11 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
 
   Falta que el autor exporte el PDF desde Word y compruebe que tiene 10 páginas o menos: en esta máquina
   no hay LibreOffice.
+- **T018 y T019**: el autor guardó `docs/informe/capturas/06-app-nube.png` (16:57) y
+  `docs/informe/capturas/07-traza-nube.png` (17:02), las dos en PNG, y se actualizaron las referencias.
+  - La 06 muestra la dirección pública, la pregunta combinada del C-201, la respuesta con cita a
+    `procedimiento_respuesta_alarmas.pdf` p. 3, la fuente "Base de datos y documentos" y "Trazas en
+    LangSmith: activadas".
+  - La 07 muestra la traza de las 4:57 PM: ruta `both`, 9,71 s en total, con router, SQL, recuperación y
+    síntesis.
+  - Ninguna de las dos muestra claves.
