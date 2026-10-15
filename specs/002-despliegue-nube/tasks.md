@@ -422,3 +422,14 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
   muestran la conexión a Neon y las trazas activadas.
 - **T014 (punto de corte)**: a las 16:45 del jueves 15 se cumplen SC-001 (T012) y SC-002 (T006). No se
   abandona: se sigue con las fases 4 a 6. T026 no se aplica.
+- **T024 (Word)**: cambios en `docs/informe/informe.docx`, validado con el validador de la herramienta de
+  Word (párrafos: 331 → 310).
+  - Fila nueva "Despliegue en la nube" en criterios de promoción, que ahora dice "se eligieron cinco".
+  - El párrafo que decía que el despliegue no se había elegido ahora explica cómo se hizo.
+  - La limitación "Supabase sin probar" pasó a ser "Servicios gratuitos en la nube".
+  - Pruebas automáticas: 105, de las cuales 5 son de la interfaz.
+  - Tabla de corridas: quedan la 1, la 2, la 3, la 9 a 11 y la 13, elegidas por el autor. El texto aclara
+    que las 13 están en `eval/results/`.
+
+  Falta que el autor exporte el PDF desde Word y compruebe que tiene 10 páginas o menos: en esta máquina
+  no hay LibreOffice.
