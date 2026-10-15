@@ -290,3 +290,10 @@ aprobaron con los ejemplos nuevos. El conjunto reservado se corrió una sola vez
 (`eval/results/20261014-233423-reservado.json`). Pruebas automáticas: 103.
 
 - [ ] T097 Correr el conjunto principal completo con los prompts nuevos, porque el cambio de ejemplos puede afectar a cualquier caso. Queda para el 2026-10-15, cuando se renueve la cuota diaria
+
+## Phase 15: Convergence
+
+- [X] T098 CRITICAL Agregar un caso de evaluación con una pregunta de "el que más" que tenga empate (el área con más alarmas críticas: Compresores de aire y Bombeo de agua, 10 cada una), sin modificar los casos existentes per Constitution V (missing)
+- [X] T099 Hacer que las consultas de "el que más" o "el que menos" conserven los empates (`FETCH FIRST 1 ROWS WITH TIES` en lugar de `LIMIT 1`), en la regla y en el ejemplo del prompt de SQL de `src/telemetry_agent/prompts.py` per FR-022 (missing)
+- [X] T100 Hacer que la síntesis nombre a todos los empatados y diga que hay un empate, en `src/telemetry_agent/prompts.py` per FR-022 (missing)
+- [ ] T101 Registrar el requisito de empates y el resultado de la corrida de T097 en el informe, el README y la guía per SC-008 (partial)

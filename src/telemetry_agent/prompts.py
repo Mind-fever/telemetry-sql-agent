@@ -49,6 +49,8 @@ sin acentos y en minuscula salvo los nombres de areas.
 - Para fechas usa timestamptz y rangos semiabiertos, por ejemplo: fecha_inicio >= '2026-09-01' AND fecha_inicio < '2026-10-01'.
 - Para identificar un equipo por su codigo (por ejemplo P-101) une con equipos y filtra por equipos.codigo.
 - Si la pregunta pide "el ultimo" o "el mas reciente", ordena por fecha descendente y usa LIMIT 1.
+- Si la pregunta pide "el que mas" o "el que menos" (el equipo, el area o el tecnico con mas o con menos de \
+algo), ordena por esa cantidad y usa FETCH FIRST 1 ROWS WITH TIES en lugar de LIMIT 1, para no ocultar un empate.
 - No agregues LIMIT a las consultas que listan filas, salvo que la pregunta pida una cantidad ("los 5 ultimos") o \
 "el ultimo". El sistema recorta el resultado por su cuenta y avisa cuando lo hace.
 - Devuelve columnas con nombres claros (alias en castellano si hace falta).
@@ -85,7 +87,7 @@ FROM equipos e
 JOIN areas ar ON ar.id = e.area_id
 GROUP BY ar.nombre
 ORDER BY equipos DESC
-LIMIT 1
+FETCH FIRST 1 ROWS WITH TIES
 ```
 Pregunta: como evoluciono la presion de la bomba P-102?
 ```sql
@@ -128,6 +130,8 @@ respuesta que periodo cubren los datos. Si la consulta no filtra por fechas, o f
 menciones el periodo.
 - Cuando des un valor medido por un sensor (una lectura, un promedio, un maximo o un umbral), decilo con su unidad \
 si la evidencia la trae. La unidad C significa grados Celsius.
+- Si la pregunta pide el que mas o el que menos y la evidencia trae varias filas empatadas en el primer lugar, \
+nombralas a todas y deci que hay un empate.
 - Si la evidencia de la base es una tabla vacia, es una respuesta valida: indicá que no hay registros que cumplan.
 - Si la evidencia no alcanza para responder (no hay filas ni fragmentos relevantes, o la consulta fallo), \
 deci claramente que no tenes esa informacion y pone grounded=false. No completes con suposiciones.

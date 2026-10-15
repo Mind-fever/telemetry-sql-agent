@@ -39,6 +39,13 @@ def test_writes_are_rejected_as_not_read_only(query):
     assert result.kind == "not_read_only", (query, result)
 
 
+def test_select_keeping_ties_is_accepted():
+    sql = ("SELECT ar.nombre, count(*) AS n FROM equipos e JOIN areas ar ON ar.id = e.area_id "
+           "GROUP BY ar.nombre ORDER BY n DESC FETCH FIRST 1 ROWS WITH TIES")
+    result = validate_sql(sql)
+    assert result.ok and "WITH TIES" in result.sql
+
+
 def test_multiple_statements_are_rejected():
     result = validate_sql("select 1 from equipos; delete from alarmas")
     assert not result.ok
