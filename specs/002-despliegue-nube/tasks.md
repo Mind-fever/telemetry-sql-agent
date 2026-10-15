@@ -297,7 +297,7 @@ con la base de Docker.
 
 ## Abandono (solo si T014 no se cumple)
 
-- [ ] T026 Si a las 20:00 del jueves 15 no se cumplen SC-001 y SC-002:
+- [X] T026 **No aplicada: el corte se cumplió a las 16:45 del jueves 15 de octubre de 2026 (T014).** Si a las 20:00 del jueves 15 no se cumplen SC-001 y SC-002:
   - Anotar en "Notas de ejecución" qué se intentó, en qué tarea falló y por qué se descartó.
   - Hacer commit de este archivo en la rama `002-despliegue-nube` y **no fusionarla**.
   - Opcional, el autor: borrar la app de Streamlit y el proyecto de Neon desde sus paneles.
