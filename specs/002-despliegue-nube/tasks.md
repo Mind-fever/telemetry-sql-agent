@@ -259,7 +259,7 @@ con la base de Docker.
     cuentan la historia. Proponerle al autor cuáles quedan antes de borrar.
   - Exportar `docs/informe/informe.pdf`, con LibreOffice si está instalado; si no, lo hace el autor desde
     Word. Comprobar que el PDF tiene 10 páginas o menos.
-- [ ] T025 Cerrar la funcionalidad:
+- [X] T025 Cerrar la funcionalidad:
   - Cambiar el Status de `specs/002-despliegue-nube/spec.md` a "Implementada" con la fecha.
   - Marcar estas tareas y completar "Notas de ejecución".
   - **Antes del commit final, comprobar que no hay secretos en la rama** (FR-009, principio IV, hallazgo C1
@@ -452,4 +452,4 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
     escrito en esta lista.
   - No hay hosts de Neon (`ep-….neon.tech`) en el repo.
   - `git ls-files .env .streamlit/secrets.toml` no devuelve nada.
-  - Pendiente: fusionar en `master` y subir, con el OK del autor.
+  - Con el OK del autor, `002-despliegue-nube` se fusionó en `master` (avance rápido) y se subió a GitHub el 2026-10-15.
