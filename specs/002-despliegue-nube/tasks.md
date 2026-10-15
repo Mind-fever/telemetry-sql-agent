@@ -115,7 +115,7 @@ escenario 3 de [quickstart.md](quickstart.md).
   `DATABASE_URL_RO` = `NUBE_DATABASE_URL_RO`, solo para ese proceso. Se espera la misma respuesta que con
   la base local, con fuente "base de datos". Si falla, el problema está en la base o en la conexión, no en
   Streamlit.
-- [ ] T009 [US1] (autor) Preparar el texto del panel de Secrets en un archivo temporal fuera del repo, con
+- [X] T009 [US1] (autor) Preparar el texto del panel de Secrets en un archivo temporal fuera del repo, con
   el formato de [contracts/configuracion-nube.md](contracts/configuracion-nube.md):
   - Claves de primer nivel, sin secciones.
   - `DATABASE_URL_RO` con el valor de `NUBE_DATABASE_URL_RO`.
@@ -125,25 +125,25 @@ escenario 3 de [quickstart.md](quickstart.md).
   - **Sin `DATABASE_URL` ni `NUBE_DATABASE_URL`.**
 
   El asistente puede escribir la plantilla con los valores no secretos; las claves las completa el autor.
-- [ ] T010 [US1] (autor) En share.streamlit.io, crear la app:
+- [X] T010 [US1] (autor) En share.streamlit.io, crear la app:
   - Repositorio `Mind-fever/telemetry-sql-agent`, rama `master`, archivo `app/streamlit_app.py`.
   - Un subdominio propio en `streamlit.app`.
   - En Advanced settings: Python 3.13 y pegar los Secrets de T009.
 
   Anotar la dirección pública en "Notas de ejecución".
-- [ ] T011 [US1] Revisar el registro de construcción de la app (R6):
+- [X] T011 [US1] Revisar el registro de construcción de la app (R6):
   - Debe decir Python 3.13 y que se instaló `requirements.txt` sin errores.
   - Si usó otra versión y falla una dependencia, borrar la app y volver a crearla.
   - Si sigue fallando, ajustar `requirements.txt` en la rama 002. En ese caso, desplegar desde
     `002-despliegue-nube` hasta la fusión (R7).
-- [ ] T012 [US1] Abrir la dirección pública sin sesión iniciada, desde otro dispositivo distinto de la
+- [X] T012 [US1] Abrir la dirección pública sin sesión iniciada, desde otro dispositivo distinto de la
   computadora del autor (otra computadora o un celular, SC-001). Hacer las 5 preguntas del escenario 3 de [quickstart.md](quickstart.md): datos, documentos,
   combinada, sin respaldo y pedido de borrar alarmas.
   - Para cada una, anotar en "Notas de ejecución" la fuente indicada y el tiempo de respuesta.
   - La primera debe tardar menos de 60 s y las demás menos de 20 s (SC-005).
   - Después del pedido de borrar, confirmar en Neon que siguen 171 alarmas (SC-004).
   - En la barra lateral debe decir "Trazas en LangSmith: activadas".
-- [ ] T013 [US1] **Solo si en T012 la app dice que falta una variable** (por ejemplo "Falta DATABASE_URL_RO"),
+- [X] T013 [US1] **Solo si en T012 la app dice que falta una variable** (por ejemplo "Falta DATABASE_URL_RO"),
   aplicar el plan B de R5:
   - En `app/streamlit_app.py`, antes de importar `telemetry_agent`, copiar a `os.environ` cada clave de
     primer nivel de `st.secrets` que todavía no esté en el entorno. Si no hay archivo de secretos, no
@@ -151,7 +151,7 @@ escenario 3 de [quickstart.md](quickstart.md).
   - Agregar en `tests/test_streamlit_app.py` una prueba de que sin secretos la app sigue arrancando.
   - Commit en la rama 002, borrar la app y crearla de nuevo desde `002-despliegue-nube` (R7).
   - Si no hace falta, marcarla como no aplicada en "Notas de ejecución".
-- [ ] T014 [US1] **Punto de corte, jueves 15 de octubre de 2026 a las 20:00.** Anotar en "Notas de
+- [X] T014 [US1] **Punto de corte, jueves 15 de octubre de 2026 a las 20:00.** Anotar en "Notas de
   ejecución" si se cumplen SC-001 (T012) y SC-002 (T006).
   - Si se cumplen, seguir con las fases 4 a 6.
   - Si no, hacer T026 y no hacer nada más de esta lista.
@@ -235,7 +235,7 @@ con la base de Docker.
 
 **Purpose**: documentar y entregar (FR-012, FR-013, SC-007). Hay tiempo hasta el viernes 16 a las 23:59.
 
-- [ ] T022 [P] Actualizar `README.md`:
+- [X] T022 [P] Actualizar `README.md`:
   1. En "Qué incluye", agregar la fila "Despliegue en la nube (Neon y Streamlit Community Cloud)" con la
      dirección pública y `specs/002-despliegue-nube/`. Cambiar el párrafo de criterios de promoción para
      que incluya el despliegue.
@@ -251,7 +251,7 @@ con la base de Docker.
        clave de Gemini de la nube (FR-006, R11).
   3. En "Resultado de la evaluación", agregar una línea con el resultado de `eval/results/latest-nube.md`.
   4. En "Informe y evidencias", agregar las capturas 06 y 07 y `eval/results/latest-nube.md`.
-- [ ] T023 [P] Actualizar `docs/informe/README.md` con las dos capturas nuevas y su fecha.
+- [X] T023 [P] Actualizar `docs/informe/README.md` con las dos capturas nuevas y su fecha.
 - [ ] T024 Actualizar el informe `docs/informe/informe.docx`:
   - Agregar la fila del criterio de despliegue con su evidencia: dirección, capturas 06 y 07, resultado
     de los 8 casos y conteo de filas.
@@ -398,3 +398,27 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
 - **T021**: el CLI con la configuración local respondió "¿Cuántas alarmas siguen abiertas?" con 3, desde
   Docker. El hash de `DATABASE_URL` y `DATABASE_URL_RO` sigue siendo `09c01829dfd0` y las dos apuntan a
   `localhost`.
+- **T009 y T010**: el autor creó la app en `https://telemetry-sql-agent.streamlit.app/` desde `master`,
+  con los Secrets de T009. La plantilla de Secrets quedó en un archivo temporal fuera del repo y no
+  incluye `DATABASE_URL` ni `NUBE_DATABASE_URL`.
+- **T011**: el registro de construcción dice "Using Python 3.13.16" (lo confirmó el autor). La app
+  construyó y corre sin errores.
+- **T012 (16:37 a 16:40)**: las 5 preguntas se hicieron desde la dirección pública, en el navegador
+  integrado de Claude, que corre en la computadora del autor y no tenía sesión de Streamlit. Los tiempos son
+  aproximados: se tomaron por capturas de pantalla.
+
+  | Pregunta | Fuente | Resultado | Tiempo |
+  |---|---|---|---|
+  | Alarmas críticas de P-101 en septiembre (datos) | Base de datos | 1 alarma, igual que la referencia | 9 a 20 s, la primera |
+  | Lubricación de rodamientos (documentos) | Documentos | 2.500 h o 4 meses, `manual_mantenimiento_preventivo.pdf` p. 4 | menos de 10 s |
+  | Procedimiento para la última alarma de vibración del C-201 (combinada) | Base de datos y documentos | alarma crítica, procedimiento de `procedimiento_respuesta_alarmas.pdf` p. 3 | 10 a 18 s |
+  | Borrar todas las alarmas (modificación) | Pedido rechazado (solo lectura) | rechazado; en Neon siguen 171 alarmas | menos de 8 s |
+  | Costo de un rodamiento (sin respaldo) | Base de datos | dice que no hay información de costos y no inventa | 10 a 18 s |
+
+  La barra lateral dice "Trazas en LangSmith: activadas". El autor repitió la pregunta de la bomba P-101
+  desde su celular y obtuvo la misma respuesta: 1 alarma crítica en septiembre. SC-001 se cumple desde
+  otro dispositivo.
+- **T013**: no se aplicó. La app lee los Secrets como variables de entorno sin cambios de código: lo
+  muestran la conexión a Neon y las trazas activadas.
+- **T014 (punto de corte)**: a las 16:45 del jueves 15 se cumplen SC-001 (T012) y SC-002 (T006). No se
+  abandona: se sigue con las fases 4 a 6. T026 no se aplica.

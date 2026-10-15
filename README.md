@@ -20,20 +20,25 @@ Solo lee: nunca modifica la base.
 | Spec Driven Development con GitHub Spec Kit | `.specify/` y `specs/001-agente-sql-telemetria/` |
 | Pruebas automáticas | `tests/` |
 | Informe técnico y capturas | `docs/informe/` |
+| Despliegue en la nube: base en Neon y app en Streamlit Community Cloud | https://telemetry-sql-agent.streamlit.app/ y `specs/002-despliegue-nube/` |
 
-Criterios de promoción que cubre: SDD, framework agéntico (LangGraph), interfaz gráfica (Streamlit) y
-observabilidad y evaluación (LangSmith). El despliegue en la nube no está incluido: el agente y la base corren
-en la computadora de quien lo usa.
+Criterios de promoción que cubre: SDD, framework agéntico (LangGraph), interfaz gráfica (Streamlit),
+observabilidad y evaluación (LangSmith) y despliegue en la nube (Neon y Streamlit Community Cloud). La versión
+local con Docker sigue funcionando igual.
 
 ## Resultado de la evaluación
 
 Última corrida, 15 de octubre de 2026, con `gemini-3.5-flash-lite`: 43 de 43 casos aprobados con
 `eval/run_eval.py`. El experimento de LangSmith del mismo día dio 42 de 43: una pregunta sin respaldo se
 respondió bien, pero sin buscar en las fuentes. El detalle está en `eval/results/latest.md`.
-Las pruebas automáticas son 104 y pasan todas.
+Las pruebas automáticas son 105 y pasan todas.
 
 Además hay un conjunto reservado de 8 casos (`eval/reservado.jsonl`) que no se usó para ajustar los prompts.
 Se corrió una sola vez, el 14 de octubre de 2026, y dio 8 de 8 (`eval/results/latest-reservado.md`).
+
+Contra la base en la nube (Neon) se corrieron 8 casos del conjunto principal, uno por categoría
+(`eval/nube.jsonl`). El 15 de octubre de 2026 dieron 8 de 8, con el mismo resultado y la misma ruta que en
+local, caso por caso (`eval/results/latest-nube.md`).
 
 El modelo no responde siempre igual, así que el resultado puede variar entre corridas. El historial de las
 corridas anteriores, con los errores que se encontraron y corrigieron, está en `eval/results/` y en el informe.
@@ -104,6 +109,7 @@ docker compose exec -T db psql -U postgres -d telemetria -f /tmp/telemetria_dato
 | `GEMINI_EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS` | Embeddings. Por defecto `gemini-embedding-2` con 768 dimensiones. |
 | `LANGSMITH_TRACING`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT` | Trazas en LangSmith. |
 | `SQL_MAX_ROWS`, `SQL_TIMEOUT_MS`, `SQL_MAX_RETRIES`, `RETRIEVAL_TOP_K` | Límites del agente. |
+| `NUBE_DATABASE_URL`, `NUBE_DATABASE_URL_RO` | Opcionales. Conexiones a la base de Neon, para desplegar en la nube (ver "Despliegue en la nube"). |
 
 El archivo `.env` no se sube al repositorio.
 
@@ -155,6 +161,8 @@ Se usó GitHub Spec Kit. Los artefactos, en el orden en que se generaron:
 3. `specs/001-agente-sql-telemetria/plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`.
 4. `specs/001-agente-sql-telemetria/tasks.md`: tareas, marcadas a medida que se implementaron. Las fases 9 a 11
    son tareas que surgieron durante la implementación y las corridas reales, cada una con su motivo.
+5. `specs/002-despliegue-nube/`: el despliegue en la nube, como una funcionalidad aparte con su propia
+   especificación, plan y tareas. Las notas de ejecución de `tasks.md` registran cada verificación.
 
 ## Informe y evidencias
 
@@ -163,6 +171,8 @@ Se usó GitHub Spec Kit. Los artefactos, en el orden en que se generaron:
 | Informe técnico (PDF y Word) | `docs/informe/` |
 | Capturas de la interfaz y de una traza de LangSmith | `docs/informe/capturas/` |
 | Resultado de la última evaluación | `eval/results/latest.md` (el detalle por caso está en el `.json` de la misma carpeta) |
+| Resultado de los 8 casos contra la base en la nube | `eval/results/latest-nube.md` |
+| Capturas de la app en la nube y de su traza | `docs/informe/capturas/06-app-nube.jpg`, `07-traza-nube.png` |
 | Casos de evaluación y respuestas esperadas | `eval/golden.jsonl` |
 | Guía de los datos y de la demostración | `docs/guia-demo.md` |
 | Enunciado del trabajo | `docs/Enunciado.pdf` |
@@ -173,11 +183,88 @@ Los datos y los PDF son ficticios y están hechos para este trabajo. Los PDF no 
 instalación real. Las fechas de los datos van del 2026-09-01 al 2026-09-30; el agente toma el 30 de septiembre
 como "hoy".
 
-## Base de datos en la nube
+## Despliegue en la nube
 
-El agente se conecta por `DATABASE_URL`, así que en principio sirve cualquier PostgreSQL con pgvector, por ejemplo
-un proyecto de Supabase. Esa opción no se probó: todo el desarrollo, las pruebas y la evaluación se hicieron con
-la base local de Docker.
+La app está publicada en **https://telemetry-sql-agent.streamlit.app/**. Es pública hasta el 30 de octubre de
+2026 y no pide iniciar sesión. La base está en Neon (PostgreSQL con pgvector, plan gratuito) y la interfaz en
+Streamlit Community Cloud (gratuito), desplegada desde la rama `master`. No hubo que cambiar el código: el
+agente lee la conexión y las claves de variables de entorno. La especificación, el plan y las tareas están en
+`specs/002-despliegue-nube/`.
+
+En la nube la app solo tiene la conexión del rol `agent_ro`, que solo puede leer. La conexión con permisos de
+escritura se usa una sola vez, desde la computadora de quien despliega, para cargar la base. Nunca se carga
+en Streamlit.
+
+### 1. Base en Neon
+
+1. Crear un proyecto en https://neon.tech. Neon trae pgvector y la base se despierta sola con la primera
+   consulta. Copiar la cadena de conexión *pooled* (el host termina en `-pooler`).
+2. Agregar al final de `.env` dos variables nuevas, sin tocar `DATABASE_URL` ni `DATABASE_URL_RO`, que siguen
+   apuntando a Docker:
+   - `NUBE_DATABASE_URL`: la cadena de Neon, tal como se copió.
+   - `NUBE_DATABASE_URL_RO`: la misma cadena con el usuario `agent_ro` y una clave nueva, larga y al azar, por
+     ejemplo la que da `python -c "import secrets; print(secrets.token_urlsafe(24))"`. Neon exige claves de al
+     menos 60 bits de entropía.
+3. Crear las tablas y el rol, y cargar el volcado. Se usa la conexión **directa**, que es la misma cadena sin
+   `-pooler` en el host, porque el volcado necesita una sesión estable. Las variables se definen solo para cada
+   comando, así `.env` no cambia (`load_dotenv` no pisa una variable que ya está definida):
+
+   ```bash
+   DATABASE_URL="<cadena directa de Neon>" DATABASE_URL_RO="<NUBE_DATABASE_URL_RO>" python scripts/setup_db.py
+   docker compose cp db/dump/telemetria_datos.sql db:/tmp/telemetria_datos.sql
+   PGURL="<cadena directa de Neon>" docker compose exec -T -e PGURL db sh -c 'psql "$PGURL" -v ON_ERROR_STOP=1 -f /tmp/telemetria_datos.sql'
+   ```
+
+   El `psql` del contenedor de Docker sirve aunque no haya `psql` instalado. Al terminar, cada tabla tiene que
+   tener las mismas filas que la base local: 18 áreas, 20 técnicos, 40 equipos, 108 sensores, 38.880 lecturas,
+   171 alarmas, 153 órdenes y 18 fragmentos.
+
+### 2. Probar el agente contra Neon
+
+```bash
+DATABASE_URL_RO="<NUBE_DATABASE_URL_RO>" python -m telemetry_agent.cli "¿Cuántas alarmas críticas tuvo la bomba P-101 en septiembre?"
+DATABASE_URL_RO="<NUBE_DATABASE_URL_RO>" DATABASE_URL="<cadena directa de Neon>" LANGSMITH_PROJECT=agente-sql-telemetria-nube python eval/run_eval.py --cases eval/nube.jsonl --delay 5
+```
+
+`run_eval.py` usa `DATABASE_URL` para las consultas de referencia y para comprobar que los datos quedaron
+intactos, por eso esa variable también apunta a Neon. El resultado va a `eval/results/latest-nube.md` y no
+pisa el de los 43 casos.
+
+### 3. App en Streamlit Community Cloud
+
+En https://share.streamlit.io: Create app, repositorio `Mind-fever/telemetry-sql-agent`, rama `master`,
+archivo `app/streamlit_app.py`. En Advanced settings, elegir **Python 3.13** y cargar los Secrets como claves
+de primer nivel, sin secciones `[...]`, porque solo las de primer nivel llegan como variables de entorno:
+
+| Secret | Valor |
+|---|---|
+| `DATABASE_URL_RO` | el valor de `NUBE_DATABASE_URL_RO` |
+| `GEMINI_API_KEY` | una clave **aparte**, de otro proyecto de Google AI Studio, para no gastar la cuota de desarrollo |
+| `LANGSMITH_API_KEY` | la clave de LangSmith |
+| `LANGSMITH_PROJECT` | `agente-sql-telemetria-nube`, para separar las trazas de la nube de las locales |
+| `LANGSMITH_TRACING`, `GEMINI_MODEL`, `GEMINI_EMBEDDING_MODEL`, `EMBEDDING_DIMENSIONS`, `SQL_MAX_ROWS`, `SQL_TIMEOUT_MS`, `SQL_MAX_RETRIES`, `RETRIEVAL_TOP_K` | los mismos valores que en `.env` |
+
+**No cargar `DATABASE_URL` ni `NUBE_DATABASE_URL`.** La app no las necesita y tienen permisos de escritura.
+
+Después de desplegar, conviene revisar en el registro de construcción que diga Python 3.13. Si muestra otra
+versión y falla una dependencia, hay que borrar la app y crearla de nuevo, porque la versión no se puede cambiar
+sobre una app existente.
+
+### 4. Si la app o la base están dormidas
+
+- **Streamlit** duerme la app tras unas 12 horas sin visitas. Al abrirla aparece un aviso con un botón para
+  despertarla, y en unos minutos vuelve a responder. Antes de una demostración, conviene abrirla y hacer una
+  pregunta unos minutos antes.
+- **Neon** suspende la base tras unos minutos sin uso y la despierta sola con la primera consulta. Esa primera
+  respuesta tarda unos segundos más.
+
+### 5. Después del 30 de octubre de 2026
+
+La app es pública solo mientras dura la evaluación. Después hay que:
+
+1. Borrarla en el panel de Streamlit, o hacerla privada con acceso solo para correos invitados.
+2. Regenerar o borrar en Google AI Studio la clave de Gemini que usa la nube.
+3. Opcional: borrar el proyecto de Neon.
 
 ## Problemas frecuentes
 
