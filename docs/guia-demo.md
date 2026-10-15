@@ -113,7 +113,7 @@ Cómo se gestionan las órdenes.
 
 ## 3. Preguntas que funcionan bien
 
-Una por cada capacidad del agente. Las marcadas con (E) son casos de la evaluación, que dio 42 de 42.
+Una por cada capacidad del agente. Las marcadas con (E) son casos de la evaluación, que dio 43 de 43.
 Las marcadas con (P) se probaron aparte el 13 de octubre de 2026.
 
 ### Datos de la base
@@ -182,6 +182,7 @@ Estos tres comportamientos se agregaron el 13 de octubre de 2026, después de pr
 |---|---|
 | ¿Cuántas órdenes de mantenimiento se cerraron el mes pasado? (E) | Responde 0 y aclara que los datos cubren del 1 al 30 de septiembre. Para el agente "hoy" es el 30 de septiembre, así que el mes pasado es agosto |
 | ¿Cuál fue la temperatura promedio del motor M-301? (E) | 57,67 C. Incluye la unidad |
+| ¿Cuál es el área con más alarmas críticas? (E) | Dice que hay un empate: Compresores de aire y Bombeo de agua, con 10 cada una |
 | Mostrame la evolución de la vibración del compresor C-201 (E) | Un renglón por día, con promedio y máximo en mm/s. Son 30 días y entra completo |
 
 ### Seguimiento

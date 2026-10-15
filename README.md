@@ -27,9 +27,10 @@ en la computadora de quien lo usa.
 
 ## Resultado de la evaluación
 
-Última corrida, 14 de octubre de 2026, con `gemini-3.5-flash-lite`: 42 de 42 casos aprobados con
-`eval/run_eval.py`, y 42 de 42 en el experimento de LangSmith. El detalle está en `eval/results/latest.md`.
-Las pruebas automáticas son 103 y pasan todas.
+Última corrida, 15 de octubre de 2026, con `gemini-3.5-flash-lite`: 43 de 43 casos aprobados con
+`eval/run_eval.py`. El experimento de LangSmith del mismo día dio 42 de 43: una pregunta sin respaldo se
+respondió bien, pero sin buscar en las fuentes. El detalle está en `eval/results/latest.md`.
+Las pruebas automáticas son 104 y pasan todas.
 
 Además hay un conjunto reservado de 8 casos (`eval/reservado.jsonl`) que no se usó para ajustar los prompts.
 Se corrió una sola vez, el 14 de octubre de 2026, y dio 8 de 8 (`eval/results/latest-reservado.md`).
@@ -73,7 +74,7 @@ python -m telemetry_agent.cli "¿Cuántas alarmas críticas hubo en septiembre?"
 
 # 6. Evaluar
 python eval/run_eval.py --check-refs        # valores de referencia, sin modelo
-python eval/run_eval.py                     # corre los 42 casos; el resultado queda en eval/results/
+python eval/run_eval.py                     # corre los 43 casos; el resultado queda en eval/results/
 python eval/run_langsmith_experiment.py     # los mismos casos como experimento de LangSmith
 python eval/run_eval.py --cases eval/reservado.jsonl   # conjunto reservado; resultado en latest-reservado.md
 ```
@@ -133,7 +134,7 @@ respuesta, fuente elegida, consulta SQL, filas, fragmentos citados y si el pedid
 
 ## Evaluación
 
-`eval/golden.jsonl` tiene 42 casos: preguntas de datos, de documentos, combinadas, pedidos de escritura que deben
+`eval/golden.jsonl` tiene 43 casos: preguntas de datos, de documentos, combinadas, pedidos de escritura que deben
 rechazarse, preguntas sin respaldo, preguntas que no necesitan fuente, casos borde y una de seguimiento.
 
 Las verificaciones son deterministas, sin un modelo que haga de juez. Para las preguntas de datos, el evaluador
