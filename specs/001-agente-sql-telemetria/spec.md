@@ -31,6 +31,14 @@ tres cambian el comportamiento.
 - Q: Cuando la respuesta es un valor medido por un sensor, ¿debe incluir la unidad? → A: Sí, siempre (grados, mm/s, bar o amperes, según el sensor).
 - Q: Cuando se pide la evolución de una magnitud en el tiempo, ¿se muestran las lecturas una por una? → A: No. Se responde con un resumen por día (promedio y máximo), que entra completo sin recortar.
 
+### Session 2026-10-14
+
+Decisiones del autor al revisar qué tan representativa es la evaluación. Cambian el método de
+evaluación, no el comportamiento del agente.
+
+- Q: Los prompts traen ejemplos resueltos, y algunos son casi iguales a casos de la evaluación (por ejemplo, las alarmas críticas del área Bombeo de agua). ¿Se aceptan? → A: No. Ningún ejemplo de los prompts repite una pregunta de la evaluación, porque ese caso mediría si el modelo copia el ejemplo y no si entiende la pregunta.
+- Q: ¿Cómo se mide el agente ante preguntas que no se usaron para ajustarlo? → A: Con un conjunto reservado de 8 casos nuevos, en un archivo aparte. Se corre una vez, no se ajusta nada a partir de su resultado y ese resultado se informa por separado del conjunto principal.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Consultar datos de operación y mantenimiento (Priority: P1)
@@ -144,6 +152,8 @@ Quien desarrolla el agente puede ver el recorrido de cada pregunta (qué fuente 
 - **FR-017**: Cuando la pregunta se refiere a un período que cae total o parcialmente fuera de las fechas con datos, el agente MUST aclarar en la respuesta qué período cubren los datos.
 - **FR-018**: Cuando la respuesta incluye un valor medido por un sensor (una lectura, un promedio, un máximo o un umbral), el agente MUST indicar su unidad de medida.
 - **FR-019**: Cuando se pide la evolución o la tendencia de una magnitud en el tiempo, el agente MUST responder con un resumen por día (promedio y máximo) en lugar de las lecturas individuales.
+- **FR-020**: La evaluación MUST incluir un conjunto reservado, separado del conjunto principal, que no se use para ajustar el agente. Su resultado se informa aparte.
+- **FR-021**: Los ejemplos que traen los prompts MUST NOT repetir preguntas del conjunto de evaluación.
 
 ### Key Entities *(include if feature involves data)*
 

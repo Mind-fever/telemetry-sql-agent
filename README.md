@@ -29,7 +29,10 @@ en la computadora de quien lo usa.
 
 Última corrida, 14 de octubre de 2026, con `gemini-3.5-flash-lite`: 42 de 42 casos aprobados con
 `eval/run_eval.py`, y 42 de 42 en el experimento de LangSmith. El detalle está en `eval/results/latest.md`.
-Las pruebas automáticas son 102 y pasan todas.
+Las pruebas automáticas son 103 y pasan todas.
+
+Además hay un conjunto reservado de 8 casos (`eval/reservado.jsonl`) que no se usó para ajustar los prompts.
+Se corrió una sola vez, el 14 de octubre de 2026, y dio 8 de 8 (`eval/results/latest-reservado.md`).
 
 El modelo no responde siempre igual, así que el resultado puede variar entre corridas. El historial de las
 corridas anteriores, con los errores que se encontraron y corrigieron, está en `eval/results/` y en el informe.
@@ -72,6 +75,7 @@ python -m telemetry_agent.cli "¿Cuántas alarmas críticas hubo en septiembre?"
 python eval/run_eval.py --check-refs        # valores de referencia, sin modelo
 python eval/run_eval.py                     # corre los 42 casos; el resultado queda en eval/results/
 python eval/run_langsmith_experiment.py     # los mismos casos como experimento de LangSmith
+python eval/run_eval.py --cases eval/reservado.jsonl   # conjunto reservado; resultado en latest-reservado.md
 ```
 
 Los valores de `DATABASE_URL` y `DATABASE_URL_RO` que trae `.env.example` ya sirven para la base de Docker.

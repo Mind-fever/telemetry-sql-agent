@@ -15,6 +15,7 @@ Uso:
     python eval/run_eval.py                     corre todos los casos
     python eval/run_eval.py --only sql-01,doc-01 --delay 6
     python eval/run_eval.py --category docs
+    python eval/run_eval.py --cases eval/reservado.jsonl   conjunto reservado: su resultado va aparte
 
 Con LANGSMITH_TRACING=true y LANGSMITH_API_KEY cada ejecucion queda trazada, etiquetada con el
 id del caso, y se le adjunta el resultado (caso_aprobado) como feedback.
@@ -110,8 +111,16 @@ def answer_has_values(answer: str, ref_values: list[Any]) -> bool:
 
 
 # ------------------------------------------------------------------- casos
-def load_cases() -> list[dict]:
-    return [json.loads(line) for line in GOLDEN.read_text(encoding="utf-8").splitlines() if line.strip()]
+def load_cases(path: Path = GOLDEN) -> list[dict]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def result_names(cases_path: Path, stamp: str) -> tuple[str, str]:
+    """Nombres de los archivos de resultado. El conjunto principal escribe latest.md; otro conjunto
+    (por ejemplo el reservado) usa su propio nombre y nunca pisa el resultado del principal."""
+    if cases_path.resolve() == GOLDEN.resolve():
+        return f"{stamp}.json", "latest.md"
+    return f"{stamp}-{cases_path.stem}.json", f"latest-{cases_path.stem}.md"
 
 
 def table_counts(conn) -> dict[str, int]:
@@ -200,9 +209,11 @@ def main() -> None:
     ap.add_argument("--only", help="ids separados por coma")
     ap.add_argument("--category", help="una categoria: sql, docs, both, refuse, no_evidence, none, follow_up")
     ap.add_argument("--delay", type=float, default=4.0, help="segundos entre casos (cuidar la cuota gratuita)")
+    ap.add_argument("--cases", type=Path, default=GOLDEN,
+                    help="archivo de casos; por defecto eval/golden.jsonl (por ejemplo eval/reservado.jsonl)")
     args = ap.parse_args()
 
-    cases = load_cases()
+    cases = load_cases(args.cases)
     if args.only:
         wanted = set(args.only.split(","))
         cases = [c for c in cases if c["id"] in wanted]
@@ -307,12 +318,13 @@ def main() -> None:
     }
     RESULTS.mkdir(exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    (RESULTS / f"{stamp}.json").write_text(
+    json_name, md_name = result_names(args.cases, stamp)
+    (RESULTS / json_name).write_text(
         json.dumps({"run": run_info, "summary": summary, "results": results}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     md = to_markdown(summary, results, run_info)
-    (RESULTS / "latest.md").write_text(md, encoding="utf-8")
+    (RESULTS / md_name).write_text(md, encoding="utf-8")
     print("\n" + md)
 
 

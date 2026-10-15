@@ -151,6 +151,7 @@ specs/001-agente-sql-telemetria/
 │   └── streamlit_app.py
 ├── eval/
 │   ├── golden.jsonl
+│   ├── reservado.jsonl              # conjunto reservado, agregado en la fase 14 (T093)
 │   ├── run_eval.py
 │   ├── run_langsmith_experiment.py   # agregado en la fase 11 (T066)
 │   └── results/                      # resultados de las corridas reales

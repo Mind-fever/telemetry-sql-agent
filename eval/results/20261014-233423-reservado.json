@@ -1,0 +1,222 @@
+{
+  "run": {
+    "model": "gemini-3.5-flash-lite",
+    "planned": 8,
+    "not_run": [],
+    "stop_reason": null
+  },
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "pass_rate": 100.0,
+    "by_category": {
+      "sql": {
+        "passed": 3,
+        "total": 3
+      },
+      "docs": {
+        "passed": 2,
+        "total": 2
+      },
+      "both": {
+        "passed": 1,
+        "total": 1
+      },
+      "refuse": {
+        "passed": 1,
+        "total": 1
+      },
+      "no_evidence": {
+        "passed": 1,
+        "total": 1
+      }
+    },
+    "SC-001": {
+      "value": 100.0,
+      "target": 85.0,
+      "ok": true
+    },
+    "SC-002": {
+      "refused": "1/1",
+      "data_intact": true,
+      "ok": true
+    },
+    "SC-003": {
+      "cited": "3/3",
+      "ok": true
+    },
+    "SC-004": {
+      "declared_no_info": "1/1",
+      "ok": true
+    },
+    "SC-005": {
+      "value": 100.0,
+      "target": 90.0,
+      "ok": true
+    },
+    "SC-006": {
+      "p90_seconds": 6.6,
+      "target": 20,
+      "ok": true,
+      "median_seconds": 4.6
+    }
+  },
+  "results": [
+    {
+      "id": "res-01",
+      "category": "sql",
+      "question": "¿Cuántos técnicos tienen especialidad eléctrica?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 6.6,
+      "route": "sql",
+      "answer": "Hay 5 técnicos con especialidad eléctrica.",
+      "sql": "SELECT count(*) AS tecnicos_electricos\nFROM tecnicos\nWHERE especialidad = 'electrica'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-02",
+      "category": "sql",
+      "question": "Which compressor had the most critical alarms in September?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 4.4,
+      "route": "sql",
+      "answer": "The compressor with the most critical alarms in September was Compresor de tornillo C-201 (code C-201) with 5 critical alarms.",
+      "sql": "SELECT e.codigo, e.nombre, count(*) AS alarmas_criticas\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.tipo = 'compresor' \n  AND a.severidad = 'critica'\n  AND a.fecha_inicio >= '2026-09-01' AND a.fecha_inicio < '2026-10-01'\nGROUP BY e.id, e.codigo, e.nombre\nORDER BY alarmas_criticas DESC\nLIMIT 1",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-03",
+      "category": "sql",
+      "question": "Decime qué órdenes de prioridad alta están en curso",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 5.5,
+      "route": "sql",
+      "answer": "Las órdenes de prioridad alta en curso son: ID 58 (Ventilador axial V-401, 2026-09-30), ID 24 (Motor electrico M-305, 2026-09-30), ID 25 (Motor electrico M-305, 2026-09-28), ID 56 (Compresor de tornillo C-208, 2026-09-27), ID 39 (Compresor de tornillo C-201, 2026-09-27), ID 69 (Transformador de distribucion T-502, 2026-09-27), ID 15 (Bomba centrifuga P-110, 2026-09-25), ID 2 (Bomba centrifuga P-102, 2026-09-25), ID 72 (Transformador de distribucion T-505, 2026-09-24), ID 54 (Compresor de tornillo C-207, 2026-09-20), ID 63 (Ventilador axial V-405, 2026-09-19) y ID 46 (Compresor de tornillo C-205, 2026-09-12).",
+      "sql": "SELECT o.id, e.codigo AS equipo_codigo, e.nombre AS equipo_nombre, o.tipo, o.prioridad, o.fecha_creacion, o.descripcion\nFROM ordenes_mantenimiento o\nJOIN equipos e ON e.id = o.equipo_id\nWHERE o.prioridad = 'alta' AND o.estado = 'en curso'\nORDER BY o.fecha_creacion DESC",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-04",
+      "category": "docs",
+      "question": "¿Cada cuántas horas hay que revisar el separador de aceite de un compresor?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "fuente_citada": true,
+        "respuesta_contiene": true
+      },
+      "seconds": 4.3,
+      "route": "docs",
+      "answer": "Hay que revisar el separador de aceite del compresor cada 8.000 horas de funcionamiento (manual_mantenimiento_preventivo.pdf, pagina 5).",
+      "sql": null,
+      "sources": [
+        [
+          "manual_mantenimiento_preventivo.pdf",
+          5
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-05",
+      "category": "docs",
+      "question": "¿Qué protección extra se necesita para trabajar en un transformador?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "fuente_citada": true,
+        "respuesta_regex": true
+      },
+      "seconds": 4.7,
+      "route": "docs",
+      "answer": "Para trabajos en transformadores se agregan guantes dieléctricos y protección facial (politica_gestion_ordenes.pdf, página 4).",
+      "sql": null,
+      "sources": [
+        [
+          "politica_gestion_ordenes.pdf",
+          4
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-06",
+      "category": "both",
+      "question": "¿Cuántos transformadores tiene la planta y con qué frecuencia se les hace la inspección termográfica?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "fuente_citada": true,
+        "respuesta_regex": true
+      },
+      "seconds": 14.0,
+      "route": "both",
+      "answer": "La planta tiene 6 transformadores y se les hace la inspección termográfica de bornes y conexiones cada 6 meses (manual_mantenimiento_preventivo.pdf, pagina 6).",
+      "sql": "SELECT count(*) AS total_transformadores\nFROM equipos\nWHERE tipo = 'transformador'",
+      "sources": [
+        [
+          "manual_mantenimiento_preventivo.pdf",
+          6
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-07",
+      "category": "refuse",
+      "question": "Please add a new technician called John Smith to the database.",
+      "passed": true,
+      "checks": {
+        "rechazado": true
+      },
+      "seconds": 2.1,
+      "route": "refuse",
+      "answer": "I am sorry, but this assistant only queries information and cannot modify the database or add new records.",
+      "sql": null,
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "res-08",
+      "category": "no_evidence",
+      "question": "¿Cuál es el número de teléfono del fabricante de la bomba P-101?",
+      "passed": true,
+      "checks": {
+        "sin_evidencia_declarada": true
+      },
+      "seconds": 3.5,
+      "route": "sql",
+      "answer": "No tengo esa información.",
+      "sql": "SELECT e.fabricante\nFROM equipos e\nWHERE e.codigo = 'P-101'",
+      "sources": [],
+      "grounded": false,
+      "error": null
+    }
+  ]
+}

@@ -122,6 +122,11 @@ reales están marcados como "Actualización" con su fecha, y esos sí salen de u
   escribió una consulta distinta para un caso combinado y la verificación de filas no la aceptó, aunque
   la respuesta era correcta. Las dos corridas locales de ese día dieron 42 de 42.
   El experimento usa las mismas verificaciones deterministas que `eval/run_eval.py`.
+- **Actualización del 2026-10-14 (decisión del autor)**: los prompts tenían ejemplos resueltos casi
+  iguales a siete casos de la evaluación, así que esos casos medían en parte si el modelo copiaba el
+  ejemplo. Se reemplazaron por preguntas que no están en la evaluación, y los siete casos siguieron
+  aprobando. Además se agregó un conjunto reservado de 8 casos (`eval/reservado.jsonl`) que no se usa
+  para ajustar el agente: se corrió una sola vez y dio 8 de 8.
 - **Por qué verificaciones deterministas**: comparar el resultado de la consulta generada con el de
   una consulta de referencia, y comprobar el archivo y la página citados, es reproducible y se
   puede explicar en el coloquio. Un juez basado en modelo agrega variabilidad y consumo de cuota.

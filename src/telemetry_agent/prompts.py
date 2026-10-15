@@ -8,13 +8,13 @@ donde sale la respuesta a la pregunta del usuario. No respondas la pregunta salv
 Fuentes disponibles:
 1. BASE DE DATOS (ruta "sql"): datos registrados de la planta: areas, equipos (codigos como P-101, C-201), sensores, \
 lecturas de telemetria, alarmas (alerta/critica), ordenes de mantenimiento y tecnicos. Sirve para contar, listar, \
-sumar, comparar o buscar hechos concretos, por ejemplo "cuantas alarmas criticas hubo en septiembre".
+sumar, comparar o buscar hechos concretos, por ejemplo "cuantas ordenes preventivas se cerraron este mes".
 2. DOCUMENTOS (ruta "docs"): tres PDF: un manual de mantenimiento preventivo (frecuencias y tareas por tipo de equipo), \
 un procedimiento de respuesta a alarmas (que hacer segun la magnitud y la severidad, umbrales de referencia, tiempos \
 de respuesta) y una politica de gestion de ordenes (prioridades, plazos, bloqueo y etiquetado, cierre). Sirve para \
 preguntas de "como", "cada cuanto", "que procedimiento", "cual es el plazo".
 3. Ambas (ruta "both"): cuando la pregunta necesita un dato concreto de la base Y un procedimiento o norma de los \
-documentos, por ejemplo "que procedimiento corresponde a la ultima alarma critica de la bomba P-101".
+documentos, por ejemplo "que plazo tiene, segun la politica, la orden abierta mas antigua del motor M-305".
 4. Ninguna (ruta "none"): saludos, agradecimientos, preguntas sobre que podes hacer, o temas que no tienen relacion \
 con la planta. En direct_reply respondé brevemente; si el tema no tiene relacion, aclara que solo ayudas con la \
 operacion y el mantenimiento de la planta.
@@ -28,8 +28,8 @@ y elegi la misma fuente que correspondia a la pregunta anterior.
 - La ruta none es solo para saludos y temas ajenos a la planta. Si la pregunta es sobre equipos, repuestos, \
 mantenimiento u operacion de la planta, nunca elijas none aunque creas que la respuesta no esta en las fuentes: \
 elegi docs o sql para que se busque. Si no aparece, lo informa el paso siguiente.
-- Excepcion: si la pregunta es tan ambigua que no se sabe que equipo o que dato pide (por ejemplo "que pasa con el \
-motor?", sin codigo ni dato concreto, y el historial no lo aclara), elegi none y en direct_reply pedi que precise el \
+- Excepcion: si la pregunta es tan ambigua que no se sabe que equipo o que dato pide (por ejemplo "dame un informe \
+del equipo", sin codigo ni dato concreto, y el historial no lo aclara), elegi none y en direct_reply pedi que precise el \
 codigo del equipo y que quiere saber (alarmas, lecturas, ordenes, procedimiento).
 - Si dudas entre sql y docs porque la pregunta menciona ambos tipos de informacion, elegi both.
 - language es el idioma en que escribio el usuario: es o en. direct_reply debe estar en ese idioma.
@@ -66,27 +66,25 @@ hecho es una alarma puntual (la ultima, la mas reciente), incluye codigo del equ
 y fecha_inicio. Si el hecho es una cantidad de alarmas, vale la regla del conteo en una sola fila.
 - Si el esquema no tiene una columna para el dato pedido (por ejemplo costos, o datos de diseño del fabricante), no \
 lo reemplaces por otra columna parecida. Un alias nunca debe darle a una columna el nombre de un dato que no es: \
-umbral_critico no es una presion nominal. En ese caso devolve los datos basicos de la entidad nombrada con sus \
+umbral_critico no es la capacidad maxima de un equipo. En ese caso devolve los datos basicos de la entidad nombrada con sus \
 nombres reales.
 
 Ejemplos:
-Pregunta: cuantas alarmas criticas hubo en el area Bombeo de agua?
+Pregunta: cuantas ordenes correctivas tiene el area Molienda?
 ```sql
-SELECT count(*) AS alarmas_criticas
-FROM alarmas a
-JOIN sensores s ON s.id = a.sensor_id
-JOIN equipos e ON e.id = s.equipo_id
-JOIN areas ar ON ar.id = e.area_id
-WHERE a.severidad = 'critica' AND ar.nombre = 'Bombeo de agua'
-```
-Pregunta: que tecnico cerro mas ordenes?
-```sql
-SELECT t.nombre, count(*) AS ordenes_cerradas
+SELECT count(*) AS ordenes_correctivas
 FROM ordenes_mantenimiento o
-JOIN tecnicos t ON t.id = o.tecnico_id
-WHERE o.estado = 'cerrada'
-GROUP BY t.nombre
-ORDER BY ordenes_cerradas DESC
+JOIN equipos e ON e.id = o.equipo_id
+JOIN areas ar ON ar.id = e.area_id
+WHERE o.tipo = 'correctivo' AND ar.nombre = 'Molienda'
+```
+Pregunta: que area tiene mas equipos?
+```sql
+SELECT ar.nombre, count(*) AS equipos
+FROM equipos e
+JOIN areas ar ON ar.id = e.area_id
+GROUP BY ar.nombre
+ORDER BY equipos DESC
 LIMIT 1
 ```
 Pregunta: como evoluciono la presion de la bomba P-102?
@@ -122,10 +120,10 @@ Reglas:
 - Responde en el idioma de la pregunta, de forma breve y directa. Para numeros y listas usa exactamente los valores \
 de la evidencia.
 - La evidencia de la base trae la consulta ejecutada y sus filas. Las filas ya cumplen todas las condiciones de la \
-consulta: si filtra por estado = 'fuera de servicio', las filas devueltas son los equipos fuera de servicio, aunque \
+consulta: si filtra por turno = 'noche', las filas devueltas son los tecnicos del turno noche, aunque \
 esa columna no aparezca entre las columnas.
 - La evidencia de la base indica el periodo_con_datos. Si la consulta filtra por fechas que caen fuera de ese \
-periodo (por ejemplo, "el mes pasado" cuando los datos empiezan este mes), da el resultado y aclara en la misma \
+periodo (por ejemplo, un mes anterior al primero con datos), da el resultado y aclara en la misma \
 respuesta que periodo cubren los datos. Si la consulta no filtra por fechas, o filtra dentro del periodo, no \
 menciones el periodo.
 - Cuando des un valor medido por un sensor (una lectura, un promedio, un maximo o un umbral), decilo con su unidad \

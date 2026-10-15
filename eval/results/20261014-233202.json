@@ -1,0 +1,194 @@
+{
+  "run": {
+    "model": "gemini-3.5-flash-lite",
+    "planned": 7,
+    "not_run": [],
+    "stop_reason": null
+  },
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "pass_rate": 100.0,
+    "by_category": {
+      "sql": {
+        "passed": 3,
+        "total": 3
+      },
+      "both": {
+        "passed": 1,
+        "total": 1
+      },
+      "no_evidence": {
+        "passed": 1,
+        "total": 1
+      },
+      "edge": {
+        "passed": 2,
+        "total": 2
+      }
+    },
+    "SC-001": {
+      "value": 100.0,
+      "target": 85.0,
+      "ok": true
+    },
+    "SC-002": {
+      "refused": "0/0",
+      "data_intact": true,
+      "ok": false
+    },
+    "SC-003": {
+      "cited": "1/1",
+      "ok": true
+    },
+    "SC-004": {
+      "declared_no_info": "1/1",
+      "ok": true
+    },
+    "SC-005": {
+      "value": 100.0,
+      "target": 90.0,
+      "ok": true
+    },
+    "SC-006": {
+      "p90_seconds": 6.0,
+      "target": 20,
+      "ok": true,
+      "median_seconds": 3.5
+    }
+  },
+  "results": [
+    {
+      "id": "sql-02",
+      "category": "sql",
+      "question": "Which technician closed the most work orders?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 8.2,
+      "route": "sql",
+      "answer": "Camila Cabrera closed the most work orders, with a total of 9.",
+      "sql": "SELECT t.nombre AS tecnico, count(*) AS ordenes_cerradas\nFROM ordenes_mantenimiento o\nJOIN tecnicos t ON t.id = o.tecnico_id\nWHERE o.estado = 'cerrada'\nGROUP BY t.id, t.nombre\nORDER BY ordenes_cerradas DESC\nLIMIT 1",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "sql-05",
+      "category": "sql",
+      "question": "¿Qué equipos están fuera de servicio?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 4.8,
+      "route": "sql",
+      "answer": "Los equipos fuera de servicio son: Compresor de tornillo C-208 (tipo compresor, fabricante Presurizar) y Motor electrico M-304 (tipo motor, fabricante Motrex).",
+      "sql": "SELECT codigo, nombre, tipo, fabricante\nFROM equipos\nWHERE estado = 'fuera de servicio'\nORDER BY codigo",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "sql-08",
+      "category": "sql",
+      "question": "¿Cuántas alarmas críticas hubo en el área Bombeo de agua?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "respuesta_menciona_valor": true
+      },
+      "seconds": 3.5,
+      "route": "sql",
+      "answer": "Hubo 10 alarmas críticas en el área Bombeo de agua.",
+      "sql": "SELECT count(*) AS alarmas_criticas\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nJOIN areas ar ON ar.id = e.area_id\nWHERE a.severidad = 'critica' AND ar.nombre = 'Bombeo de agua'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "both-01",
+      "category": "both",
+      "question": "¿Qué procedimiento corresponde a la última alarma de vibración del compresor C-201?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "filas_correctas": true,
+        "fuente_citada": true,
+        "respuesta_regex": true
+      },
+      "seconds": 6.0,
+      "route": "both",
+      "answer": "La última alarma de vibración del compresor C-201 (fecha_inicio: 2026-09-26T00:00:00-03:00) tuvo severidad critica. El procedimiento correspondiente es: Reducir la carga del equipo de inmediato y avisar al supervisor. Inspeccionar rodamientos, alineacion, desbalance y aflojamiento mecanico. Si la vibracion no baja del umbral critico en 30 minutos, detener el equipo mediante el procedimiento de bloqueo y etiquetado. Abrir una orden correctiva de prioridad alta y asignar un tecnico de especialidad mecanica. En compresores como el C-201, una vibracion critica sostenida obliga ademas a revisar el acople y el estado del aceite antes de volver a arrancar (procedimiento_respuesta_alarmas.pdf, pagina 3).",
+      "sql": "SELECT e.codigo AS equipo_codigo, s.magnitud AS sensor_magnitud, a.severidad, a.fecha_inicio\nFROM alarmas a\nJOIN sensores s ON s.id = a.sensor_id\nJOIN equipos e ON e.id = s.equipo_id\nWHERE e.codigo = 'C-201' AND s.magnitud = 'vibracion'\nORDER BY a.fecha_inicio DESC\nLIMIT 1",
+      "sources": [
+        [
+          "procedimiento_respuesta_alarmas.pdf",
+          3
+        ],
+        [
+          "procedimiento_respuesta_alarmas.pdf",
+          3
+        ]
+      ],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "noev-03",
+      "category": "no_evidence",
+      "question": "¿Cuál es la presión nominal de diseño de la bomba P-105 según el fabricante?",
+      "passed": true,
+      "checks": {
+        "sin_evidencia_declarada": true
+      },
+      "seconds": 3.4,
+      "route": "sql",
+      "answer": "No tengo esa información.",
+      "sql": "SELECT e.codigo, e.nombre, e.fabricante, e.tipo, e.estado, e.criticidad\nFROM equipos e\nWHERE e.codigo = 'P-105'",
+      "sources": [],
+      "grounded": false,
+      "error": null
+    },
+    {
+      "id": "edge-02",
+      "category": "edge",
+      "question": "¿Cómo anda la bomba?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "respuesta_regex": true
+      },
+      "seconds": 1.9,
+      "route": "none",
+      "answer": "Por favor, especifica el código de la bomba (por ejemplo, P-101) y qué deseas saber sobre ella (alarmas, lecturas, órdenes o procedimientos).",
+      "sql": null,
+      "sources": [],
+      "grounded": true,
+      "error": null
+    },
+    {
+      "id": "edge-05",
+      "category": "edge",
+      "question": "¿Cuántas órdenes de mantenimiento se cerraron el mes pasado?",
+      "passed": true,
+      "checks": {
+        "ruta": true,
+        "respuesta_regex": true
+      },
+      "seconds": 3.0,
+      "route": "sql",
+      "answer": "No hay registros que cumplan. Los datos cubren el periodo del 2026-09-01 a 2026-09-30.",
+      "sql": "SELECT count(*) AS ordenes_cerradas\nFROM ordenes_mantenimiento\nWHERE estado = 'cerrada'\n  AND fecha_cierre >= '2026-08-01'\n  AND fecha_cierre < '2026-09-01'",
+      "sources": [],
+      "grounded": true,
+      "error": null
+    }
+  ]
+}

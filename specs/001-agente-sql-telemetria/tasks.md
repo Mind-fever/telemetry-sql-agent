@@ -274,3 +274,19 @@ Resultado final (2026-10-14, `eval/results/20261014-224501.json`): 42 de 42, per
 6,2 s. Los cambios de T086 y T088 se quedan. Entre las corridas afectadas por la red o el servicio
 (`20261013-224949.json`, `20261014-214000.json` y `20261014-223425.json`) ningún caso falló por una
 respuesta del agente. Pruebas automáticas: 102.
+
+## Phase 14: Convergence
+
+- [X] T091 Reemplazar los ejemplos resueltos del prompt de SQL, que son casi iguales a `sql-08` (alarmas críticas del área Bombeo de agua) y `sql-02` (técnico que más órdenes cerró), por preguntas que no estén en la evaluación, en `src/telemetry_agent/prompts.py` per FR-021 (contradicts)
+- [X] T092 Reemplazar en los prompts del router y de la síntesis las frases de ejemplo que repiten casos de la evaluación: la última alarma crítica de la P-101 (`both-01`), "qué pasa con el motor" (`edge-02`), los equipos fuera de servicio (`sql-05`), la presión nominal (`noev-03`) y "el mes pasado" (`edge-05`), en `src/telemetry_agent/prompts.py` per FR-021 (contradicts)
+- [X] T093 Crear el conjunto reservado de 8 casos en `eval/reservado.jsonl`, con preguntas de estilos y tablas distintos a los del conjunto principal, per FR-020 (missing)
+- [X] T094 Permitir que el evaluador corra otro archivo de casos y guarde su resultado aparte, sin pisar `eval/results/latest.md`, en `eval/run_eval.py`, con su prueba, per FR-020 (missing)
+- [X] T095 Verificar con el modelo real los casos del conjunto principal afectados por T091 y T092, y correr una sola vez el conjunto reservado, sin ajustar nada a partir de su resultado, per FR-020 y FR-021 (missing)
+- [X] T096 Registrar el conjunto reservado y su resultado en `plan.md`, `research.md`, el README y el informe per SC-008 (partial)
+
+Resultado de la fase 14 (2026-10-14). Los 7 casos del conjunto principal que se parecían a los
+ejemplos de los prompts (`sql-02`, `sql-05`, `sql-08`, `both-01`, `noev-03`, `edge-02` y `edge-05`)
+aprobaron con los ejemplos nuevos. El conjunto reservado se corrió una sola vez y dio 8 de 8
+(`eval/results/20261014-233423-reservado.json`). Pruebas automáticas: 103.
+
+- [ ] T097 Correr el conjunto principal completo con los prompts nuevos, porque el cambio de ejemplos puede afectar a cualquier caso. Queda para el 2026-10-15, cuando se renueve la cuota diaria

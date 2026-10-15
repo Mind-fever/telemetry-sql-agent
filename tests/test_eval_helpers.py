@@ -168,6 +168,13 @@ def test_service_outage_waits_and_retries_once_then_stops():
     assert scope == "service" and len(calls) == 2
 
 
+def test_reserved_set_results_never_overwrite_the_main_result():
+    main_json, main_md = ev.result_names(ev.GOLDEN, "20261015-120000")
+    held_json, held_md = ev.result_names(ev.GOLDEN.with_name("reservado.jsonl"), "20261015-120000")
+    assert (main_json, main_md) == ("20261015-120000.json", "latest.md")
+    assert (held_json, held_md) == ("20261015-120000-reservado.json", "latest-reservado.md")
+
+
 def test_summary_computes_success_criteria():
     results = [
         {"id": "a", "category": "sql", "passed": True, "checks": {"ruta": True}, "seconds": 3.0, "route": "sql", "sources": [], "grounded": True},
