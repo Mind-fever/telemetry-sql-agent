@@ -305,3 +305,8 @@ proyecto de Google porque la cuota de la primera se había agotado. El experimen
 `gemini-3.5-flash-lite-77b83c3d` dio 42 de 43: en `noev-01` el router tomó la pregunta como ajena a la
 planta y respondió sin buscar en las fuentes; el contenido de la respuesta era correcto. Pruebas
 automáticas: 104.
+
+Medición de `noev-01` (2026-10-15). Antes de decidir si cambiar la regla del router por la falla del
+experimento, se corrió el caso 5 veces seguidas: aprobó las 5. En total aprobó en 17 de 18 ejecuciones.
+Se decidió no cambiar el prompt: la falla es ocasional, y mover la regla hacia "buscar siempre" podría
+afectar los casos de preguntas ajenas a la planta (`none-02`, `edge-04`), que el autor pidió no contestar.
