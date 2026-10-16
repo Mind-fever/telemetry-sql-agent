@@ -279,7 +279,7 @@ con la base de Docker.
 
 **Purpose**: los criterios que solo se pueden comprobar con el paso del tiempo (SC-007 y FR-006).
 
-- [ ] T027 (autor) **Viernes 16 de octubre de 2026, a la mañana** (hallazgo C2 del análisis). Abrir la
+- [X] T027 (autor) **Viernes 16 de octubre de 2026, a la mañana** (hallazgo C2 del análisis). Abrir la
   dirección pública después de la noche sin visitas.
   - Si aparece el aviso de app dormida, pulsar el botón para despertarla y medir cuánto tarda hasta
     que se puede hacer una pregunta. Hacer una pregunta de datos.
@@ -453,3 +453,8 @@ aplicó T013, decisión de T014, comparación de T017 y resultado de T020.)
   - No hay hosts de Neon (`ep-….neon.tech`) en el repo.
   - `git ls-files .env .streamlit/secrets.toml` no devuelve nada.
   - Con el OK del autor, `002-despliegue-nube` se fusionó en `master` (avance rápido) y se subió a GitHub el 2026-10-15.
+
+Medición de T027 (16 de octubre de 2026, hecha por el autor a mano): después de la noche, la app abrió al
+instante, sin el aviso de app dormida. La primera pregunta, una de las de ejemplo, tardó unos 25 segundos.
+No se puede saber si alguien la visitó durante la noche, porque es pública. SC-007 se cumple: la app estaba
+disponible sin tener que despertarla.
