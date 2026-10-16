@@ -1,12 +1,30 @@
 # Agente SQL de telemetría y mantenimiento industrial
 
 Trabajo Práctico Integrador de AI Engineering. Ingeniería en Informática, 5to año, UCSE Sede Rafaela.
-Autor: Santiago Nicolas Martinez (trabajo individual).
+Autor: Santiago Nicolas Martinez.
 
 Un agente de IA que responde preguntas en castellano o inglés sobre una planta industrial ficticia.
 Consulta una base de datos relacional con SQL que genera el modelo y busca en manuales en PDF con RAG.
 En cada pregunta decide por sí mismo qué fuente usar: la base, los documentos, ambas o ninguna.
 Solo lee: nunca modifica la base.
+
+## Por qué este proyecto
+
+Elegí la telemetría industrial porque es el tema de mi trabajo final de carrera: un middleware que junta datos de máquinas y sensores de distintos fabricantes, que hoy quedan aislados en cada equipo, y los lleva a un formato común. Ese trabajo resuelve cómo llegan los datos. Este agente explora el paso siguiente: cómo los consulta una persona.
+
+Pensé en quien trabaja en mantenimiento o en operaciones, que necesita saber qué equipo tuvo más alarmas o qué hacer ante una alarma crítica, sin escribir SQL ni buscar en manuales. Por eso el agente combina los datos de la planta con los procedimientos en PDF.
+
+No es parte de la tesis. Es un trabajo práctico con datos inventados, pero quedó armado de forma que podría conectarse a la telemetría real del middleware si algún día quiero extender el proyecto.
+
+Si se integrara con el middleware, habría que reemplazar Gemini por un modelo que corra localmente, porque la tesis busca no depender de servicios externos.
+
+## Sobre el proceso
+
+Era la primera vez que usaba Spec Driven Development. Antes trabajaba con agentes de IA sin una metodología: los comportamientos esperados quedaban repartidos en mensajes sueltos a lo largo de la conversación, y dependía de que el agente no perdiera el contexto con el tiempo.
+
+Con Spec Kit cada comportamiento queda escrito una sola vez en la especificación, con su criterio para comprobarlo. Además, las etapas de aclaración y de análisis me marcaron cosas que yo mismo había pasado por alto. Por ejemplo, dos escenarios que preguntaban por "el mes pasado" cuando los datos solo cubren septiembre, o una regla que el agente aplicaba de dos maneras distintas.
+
+Me resultó tan útil que la empecé a usar en otro proyecto, una herramienta de carga manual y automática de PDF, donde noté que el trabajo avanza más rápido porque las especificaciones son más claras.
 
 ## Qué incluye
 
@@ -17,7 +35,7 @@ Solo lee: nunca modifica la base.
 | Agente con LangGraph (decide la fuente, genera y valida SQL, recupera fragmentos) | `src/telemetry_agent/graph.py` |
 | Interfaz de chat con Streamlit | `app/streamlit_app.py` |
 | Trazas y evaluación con LangSmith | `eval/run_eval.py`, `eval/run_langsmith_experiment.py` |
-| Spec Driven Development con GitHub Spec Kit | `.specify/` y `specs/001-agente-sql-telemetria/` |
+| Spec Driven Development con GitHub Spec Kit | `.specify/`, `specs/001-agente-sql-telemetria/` y `specs/002-despliegue-nube/` |
 | Pruebas automáticas | `tests/` |
 | Informe técnico y capturas | `docs/informe/` |
 | Despliegue en la nube: base en Neon y app en Streamlit Community Cloud | https://telemetry-sql-agent.streamlit.app/ y `specs/002-despliegue-nube/` |
@@ -195,6 +213,8 @@ En la nube la app solo tiene la conexión del rol `agent_ro`, que solo puede lee
 escritura se usa una sola vez, desde la computadora de quien despliega, para cargar la base. Nunca se carga
 en Streamlit.
 
+Los comandos de esta sección son para bash. En Windows, correrlos desde Git Bash.
+
 ### 1. Base en Neon
 
 1. Crear un proyecto en https://neon.tech. Neon trae pgvector y la base se despierta sola con la primera
@@ -252,11 +272,11 @@ sobre una app existente.
 
 ### 4. Si la app o la base están dormidas
 
-- **Streamlit** duerme la app tras unas 12 horas sin visitas. Al abrirla aparece un aviso con un botón para
-  despertarla, y en unos minutos vuelve a responder. Antes de una demostración, conviene abrirla y hacer una
-  pregunta unos minutos antes.
-- **Neon** suspende la base tras unos minutos sin uso y la despierta sola con la primera consulta. Esa primera
-  respuesta tarda unos segundos más.
+- **Streamlit** duerme la app cuando pasa un tiempo sin visitas (unas 12 horas, según su foro). En ese caso
+  aparece un aviso con un botón para despertarla. El 16 de octubre, después de la noche, la app abrió al
+  instante. Antes de una demostración, conviene abrir la app y hacer una pregunta unos minutos antes.
+- **Neon** suspende la base cuando no se usa y la despierta sola con la primera consulta. Ese día la primera
+  pregunta tardó unos 25 segundos.
 
 ### 5. Después del 30 de octubre de 2026
 
